@@ -1,0 +1,11 @@
+# Copyrighted source material and the content build — NEVER commit these
+content-src/
+*.pdf
+OCR_REPORT.md
+
+# local tooling
+.claude/
+.DS_Store
+node_modules/
+__pycache__/
+*.pyc
