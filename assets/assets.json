@@ -33,7 +33,13 @@
   "black": "#140e0b",
   "skin": "#c98f62",
   "skin_dk": "#9c6440",
-  "red": "#8e2b22"
+  "red": "#8e2b22",
+  "gold_lt": "#f3dc8c",
+  "forest": "#2b3620",
+  "marble_dk": "#c7bfb0",
+  "skin_lt": "#e0ab7e",
+  "bronze": "#7c5a2c",
+  "foam": "#cfe0df"
  },
  "chapterDistricts": [
   "provinciae",
@@ -410,170 +416,170 @@
   "tile_via": {
    "id": "tile_via",
    "file": "tiles/tile_via.png",
-   "w": 16,
-   "h": 16,
+   "w": 32,
+   "h": 32,
    "frames": 1,
    "use": "Map: the stone-paved road (repeating texture along the path)",
-   "desc": "Seamless tile of Roman basalt paving stones (polygonal blocks), grey with darker joints."
+   "desc": "Seamless 32x32 tile of Roman basalt paving (polygonal blocks), grey with darker joints; no direction, so it sits under any curve."
   },
   "bg_provinciae": {
    "id": "bg_provinciae",
    "file": "tiles/bg_provinciae.png",
-   "w": 32,
-   "h": 32,
+   "w": 64,
+   "h": 64,
    "frames": 1,
    "use": "Map background, district: The provinces of the Empire (chapter I)",
-   "desc": "Seamless ground tile: an old parchment map-land: pale sand, faint contour specks."
+   "desc": "Seamless 64x64 ground tile: an old parchment map-land: pale sand, faint contour specks."
   },
   "bg_villa": {
    "id": "bg_villa",
    "file": "tiles/bg_villa.png",
-   "w": 32,
-   "h": 32,
+   "w": 64,
+   "h": 64,
    "frames": 1,
    "use": "Map background, district: The family villa and household",
-   "desc": "Seamless ground tile: trimmed grass and garden borders around the villa."
+   "desc": "Seamless 64x64 ground tile: trimmed grass and garden borders around the villa."
   },
   "bg_hortus": {
    "id": "bg_hortus",
    "file": "tiles/bg_hortus.png",
-   "w": 32,
-   "h": 32,
+   "w": 64,
+   "h": 64,
    "frames": 1,
    "use": "Map background, district: The garden (hortus) and peristyle",
-   "desc": "Seamless ground tile: lush garden ground with flowers (roses, lilies)."
+   "desc": "Seamless 64x64 ground tile: lush garden ground with flowers (roses, lilies)."
   },
   "bg_via": {
    "id": "bg_via",
    "file": "tiles/bg_via.png",
-   "w": 32,
-   "h": 32,
+   "w": 64,
+   "h": 64,
    "frames": 1,
    "use": "Map background, district: The Via Latina toward Tusculum",
-   "desc": "Seamless ground tile: roadside meadow, dusty verges."
+   "desc": "Seamless 64x64 ground tile: roadside meadow, dusty verges."
   },
   "bg_taberna": {
    "id": "bg_taberna",
    "file": "tiles/bg_taberna.png",
-   "w": 32,
-   "h": 32,
+   "w": 64,
+   "h": 64,
    "frames": 1,
    "use": "Map background, district: The shops of Rome",
-   "desc": "Seamless ground tile: packed earth and paving in front of shops."
+   "desc": "Seamless 64x64 ground tile: packed earth and paving in front of shops."
   },
   "bg_rus": {
    "id": "bg_rus",
    "file": "tiles/bg_rus.png",
-   "w": 32,
-   "h": 32,
+   "w": 64,
+   "h": 64,
    "frames": 1,
    "use": "Map background, district: Farm and countryside",
-   "desc": "Seamless ground tile: fields with furrows, pasture."
+   "desc": "Seamless 64x64 ground tile: fields with furrows, pasture."
   },
   "bg_silva": {
    "id": "bg_silva",
    "file": "tiles/bg_silva.png",
-   "w": 32,
-   "h": 32,
+   "w": 64,
+   "h": 64,
    "frames": 1,
    "use": "Map background, district: Forest of wild beasts",
-   "desc": "Seamless ground tile: dark forest floor."
+   "desc": "Seamless 64x64 ground tile: dark forest floor."
   },
   "bg_castra": {
    "id": "bg_castra",
    "file": "tiles/bg_castra.png",
-   "w": 32,
-   "h": 32,
+   "w": 64,
+   "h": 64,
    "frames": 1,
    "use": "Map background, district: Army camp / frontier",
-   "desc": "Seamless ground tile: trampled earth of a legionary camp."
+   "desc": "Seamless 64x64 ground tile: trampled earth of a legionary camp."
   },
   "bg_templa": {
    "id": "bg_templa",
    "file": "tiles/bg_templa.png",
-   "w": 32,
-   "h": 32,
+   "w": 64,
+   "h": 64,
    "frames": 1,
    "use": "Map background, district: Temples and the calendar",
-   "desc": "Seamless ground tile: marble paving."
+   "desc": "Seamless 64x64 ground tile: marble paving."
   },
   "bg_ludus": {
    "id": "bg_ludus",
    "file": "tiles/bg_ludus.png",
-   "w": 32,
-   "h": 32,
+   "w": 64,
+   "h": 64,
    "frames": 1,
    "use": "Map background, district: The school (ludus)",
-   "desc": "Seamless ground tile: stone floor of a schoolroom portico."
+   "desc": "Seamless 64x64 ground tile: stone floor of a schoolroom portico."
   },
   "bg_mare": {
    "id": "bg_mare",
    "file": "tiles/bg_mare.png",
-   "w": 32,
-   "h": 32,
+   "w": 64,
+   "h": 64,
    "frames": 1,
    "use": "Map background, district: Harbor and open sea",
-   "desc": "Seamless ground tile: sea water with small waves."
+   "desc": "Seamless 64x64 ground tile: sea water with small waves."
   },
   "bg_urbs": {
    "id": "bg_urbs",
    "file": "tiles/bg_urbs.png",
-   "w": 32,
-   "h": 32,
+   "w": 64,
+   "h": 64,
    "frames": 1,
    "use": "Map background, district: Streets of Rome",
-   "desc": "Seamless ground tile: basalt street paving."
+   "desc": "Seamless 64x64 ground tile: basalt street paving."
   },
   "bg_creta": {
    "id": "bg_creta",
    "file": "tiles/bg_creta.png",
-   "w": 32,
-   "h": 32,
+   "w": 64,
+   "h": 64,
    "frames": 1,
    "use": "Map background, district: Crete and the Labyrinth (myth)",
-   "desc": "Seamless ground tile: ochre Cretan earth."
+   "desc": "Seamless 64x64 ground tile: ochre Cretan earth."
   },
   "bg_caelum": {
    "id": "bg_caelum",
    "file": "tiles/bg_caelum.png",
-   "w": 32,
-   "h": 32,
+   "w": 64,
+   "h": 64,
    "frames": 1,
    "use": "Map background, district: Cliffs and sky (Daedalus and Icarus)",
-   "desc": "Seamless ground tile: pale sky with clouds."
+   "desc": "Seamless 64x64 ground tile: pale sky with clouds."
   },
   "bg_triclinium": {
    "id": "bg_triclinium",
    "file": "tiles/bg_triclinium.png",
-   "w": 32,
-   "h": 32,
+   "w": 64,
+   "h": 64,
    "frames": 1,
    "use": "Map background, district: The dining room (banquet)",
-   "desc": "Seamless ground tile: mosaic floor in deep reds."
+   "desc": "Seamless 64x64 ground tile: mosaic floor in deep reds."
   },
   "bg_theatrum": {
    "id": "bg_theatrum",
    "file": "tiles/bg_theatrum.png",
-   "w": 32,
-   "h": 32,
+   "w": 64,
+   "h": 64,
    "frames": 1,
    "use": "Map background, district: Theater and circus",
-   "desc": "Seamless ground tile: sand of the arena."
+   "desc": "Seamless 64x64 ground tile: sand of the arena."
   },
   "bg_forum": {
    "id": "bg_forum",
    "file": "tiles/bg_forum.png",
-   "w": 32,
-   "h": 32,
+   "w": 64,
+   "h": 64,
    "frames": 1,
    "use": "Map background, district: The Forum and the Capitol (finale)",
-   "desc": "Seamless ground tile: gleaming marble and gold-flecked paving."
+   "desc": "Seamless 64x64 ground tile: gleaming marble and gold-flecked paving."
   },
   "prop_cypress": {
    "id": "prop_cypress",
    "file": "props/prop_cypress.png",
-   "w": 12,
-   "h": 28,
+   "w": 14,
+   "h": 36,
    "frames": 1,
    "use": "Map decoration scattered beside the road in districts: provinciae, villa, via, silva, templa, forum",
    "desc": "tall slender Italian cypress. Anchor at bottom centre."
@@ -581,8 +587,8 @@
   "prop_pine": {
    "id": "prop_pine",
    "file": "props/prop_pine.png",
-   "w": 24,
-   "h": 24,
+   "w": 30,
+   "h": 31,
    "frames": 1,
    "use": "Map decoration scattered beside the road in districts: via, silva",
    "desc": "Italian umbrella (stone) pine. Anchor at bottom centre."
@@ -590,8 +596,8 @@
   "prop_olive": {
    "id": "prop_olive",
    "file": "props/prop_olive.png",
-   "w": 18,
-   "h": 18,
+   "w": 24,
+   "h": 23,
    "frames": 1,
    "use": "Map decoration scattered beside the road in districts: provinciae, hortus, rus, creta",
    "desc": "olive tree, silvery leaves. Anchor at bottom centre."
@@ -599,8 +605,8 @@
   "prop_bush": {
    "id": "prop_bush",
    "file": "props/prop_bush.png",
-   "w": 12,
-   "h": 9,
+   "w": 14,
+   "h": 10,
    "frames": 1,
    "use": "Map decoration scattered beside the road in districts: villa, hortus, silva",
    "desc": "low shrub with a few rose blossoms. Anchor at bottom centre."
@@ -608,8 +614,8 @@
   "prop_column": {
    "id": "prop_column",
    "file": "props/prop_column.png",
-   "w": 8,
-   "h": 24,
+   "w": 10,
+   "h": 28,
    "frames": 1,
    "use": "Map decoration scattered beside the road in districts: villa, hortus, templa, ludus, urbs, creta, triclinium, theatrum, forum",
    "desc": "single marble column. Anchor at bottom centre."
@@ -617,8 +623,8 @@
   "prop_statue": {
    "id": "prop_statue",
    "file": "props/prop_statue.png",
-   "w": 10,
-   "h": 22,
+   "w": 14,
+   "h": 31,
    "frames": 1,
    "use": "Map decoration scattered beside the road in districts: hortus, templa, ludus, theatrum, forum",
    "desc": "marble statue on a plinth. Anchor at bottom centre."
@@ -626,8 +632,8 @@
   "prop_house": {
    "id": "prop_house",
    "file": "props/prop_house.png",
-   "w": 28,
-   "h": 22,
+   "w": 44,
+   "h": 36,
    "frames": 1,
    "use": "Map decoration scattered beside the road in districts: villa, via, taberna, urbs",
    "desc": "small Roman house with terracotta roof. Anchor at bottom centre."
@@ -635,8 +641,8 @@
   "prop_shop": {
    "id": "prop_shop",
    "file": "props/prop_shop.png",
-   "w": 28,
-   "h": 22,
+   "w": 44,
+   "h": 34,
    "frames": 1,
    "use": "Map decoration scattered beside the road in districts: taberna, urbs",
    "desc": "taberna (shop front) with striped awning and goods. Anchor at bottom centre."
@@ -644,8 +650,8 @@
   "prop_sheep": {
    "id": "prop_sheep",
    "file": "props/prop_sheep.png",
-   "w": 12,
-   "h": 9,
+   "w": 14,
+   "h": 11,
    "frames": 1,
    "use": "Map decoration scattered beside the road in districts: rus",
    "desc": "white sheep (pastor et ovēs). Anchor at bottom centre."
@@ -653,8 +659,8 @@
   "prop_rock": {
    "id": "prop_rock",
    "file": "props/prop_rock.png",
-   "w": 12,
-   "h": 8,
+   "w": 13,
+   "h": 9,
    "frames": 1,
    "use": "Map decoration scattered beside the road in districts: provinciae, via, rus, silva, castra, mare, creta, caelum",
    "desc": "grey boulder. Anchor at bottom centre."
@@ -662,11 +668,11 @@
   "prop_vine": {
    "id": "prop_vine",
    "file": "props/prop_vine.png",
-   "w": 10,
-   "h": 16,
+   "w": 12,
+   "h": 19,
    "frames": 1,
    "use": "Map decoration scattered beside the road in districts: rus",
-   "desc": "grapevine on a trellis with purple grapes. Anchor at bottom centre."
+   "desc": "grapevine on a stake with purple grapes. Anchor at bottom centre."
   },
   "prop_wheat": {
    "id": "prop_wheat",
@@ -675,13 +681,13 @@
    "h": 12,
    "frames": 1,
    "use": "Map decoration scattered beside the road in districts: rus",
-   "desc": "patch of ripe wheat. Anchor at bottom centre."
+   "desc": "sheaf of ripe wheat. Anchor at bottom centre."
   },
   "prop_boat": {
    "id": "prop_boat",
    "file": "props/prop_boat.png",
-   "w": 28,
-   "h": 20,
+   "w": 33,
+   "h": 28,
    "frames": 1,
    "use": "Map decoration scattered beside the road in districts: mare",
    "desc": "merchant ship with a square sail. Anchor at bottom centre."
@@ -690,7 +696,7 @@
    "id": "prop_wave",
    "file": "props/prop_wave.png",
    "w": 14,
-   "h": 6,
+   "h": 4,
    "frames": 1,
    "use": "Map decoration scattered beside the road in districts: mare",
    "desc": "small wave crest (decor on water). Anchor at bottom centre."
@@ -698,17 +704,17 @@
   "prop_tent": {
    "id": "prop_tent",
    "file": "props/prop_tent.png",
-   "w": 20,
-   "h": 16,
+   "w": 36,
+   "h": 23,
    "frames": 1,
    "use": "Map decoration scattered beside the road in districts: castra",
-   "desc": "leather legionary tent with pennant. Anchor at bottom centre."
+   "desc": "legionary goatskin tent, gable end on, with a red pennant. Anchor at bottom centre."
   },
   "prop_standard": {
    "id": "prop_standard",
    "file": "props/prop_standard.png",
    "w": 10,
-   "h": 24,
+   "h": 30,
    "frames": 1,
    "use": "Map decoration scattered beside the road in districts: castra",
    "desc": "legion standard (aquila) with red banner. Anchor at bottom centre."
@@ -716,8 +722,8 @@
   "prop_amphora": {
    "id": "prop_amphora",
    "file": "props/prop_amphora.png",
-   "w": 8,
-   "h": 14,
+   "w": 10,
+   "h": 16,
    "frames": 1,
    "use": "Map decoration scattered beside the road in districts: villa, taberna, triclinium",
    "desc": "clay amphora. Anchor at bottom centre."
@@ -725,8 +731,8 @@
   "prop_bench": {
    "id": "prop_bench",
    "file": "props/prop_bench.png",
-   "w": 18,
-   "h": 10,
+   "w": 20,
+   "h": 12,
    "frames": 1,
    "use": "Map decoration scattered beside the road in districts: ludus",
    "desc": "school bench with a wax tablet. Anchor at bottom centre."
@@ -734,8 +740,8 @@
   "prop_templum": {
    "id": "prop_templum",
    "file": "props/prop_templum.png",
-   "w": 32,
-   "h": 28,
+   "w": 48,
+   "h": 46,
    "frames": 1,
    "use": "Map decoration scattered beside the road in districts: provinciae, templa, forum",
    "desc": "small temple facade. Anchor at bottom centre."
@@ -743,8 +749,8 @@
   "prop_wall": {
    "id": "prop_wall",
    "file": "props/prop_wall.png",
-   "w": 24,
-   "h": 14,
+   "w": 32,
+   "h": 18,
    "frames": 1,
    "use": "Map decoration scattered beside the road in districts: castra",
    "desc": "crenellated stone wall segment. Anchor at bottom centre."
@@ -753,16 +759,16 @@
    "id": "prop_labyrinth",
    "file": "props/prop_labyrinth.png",
    "w": 24,
-   "h": 24,
+   "h": 23,
    "frames": 1,
    "use": "Map decoration scattered beside the road in districts: creta",
-   "desc": "labyrinth pattern stone (Crete). Anchor at bottom centre."
+   "desc": "stone slab carved with a labyrinth (Crete). Anchor at bottom centre."
   },
   "prop_cloud": {
    "id": "prop_cloud",
    "file": "props/prop_cloud.png",
-   "w": 24,
-   "h": 10,
+   "w": 28,
+   "h": 9,
    "frames": 1,
    "use": "Map decoration scattered beside the road in districts: caelum",
    "desc": "small cloud. Anchor at bottom centre."
@@ -771,7 +777,7 @@
    "id": "prop_feather",
    "file": "props/prop_feather.png",
    "w": 10,
-   "h": 10,
+   "h": 12,
    "frames": 1,
    "use": "Map decoration scattered beside the road in districts: caelum",
    "desc": "loose feather (Icarus). Anchor at bottom centre."
@@ -779,8 +785,8 @@
   "prop_couch": {
    "id": "prop_couch",
    "file": "props/prop_couch.png",
-   "w": 24,
-   "h": 12,
+   "w": 30,
+   "h": 15,
    "frames": 1,
    "use": "Map decoration scattered beside the road in districts: triclinium",
    "desc": "dining couch (lectus triclinii). Anchor at bottom centre."
@@ -789,7 +795,7 @@
    "id": "prop_lamp",
    "file": "props/prop_lamp.png",
    "w": 8,
-   "h": 20,
+   "h": 22,
    "frames": 1,
    "use": "Map decoration scattered beside the road in districts: taberna, ludus, urbs, triclinium",
    "desc": "standing oil lamp. Anchor at bottom centre."
@@ -798,16 +804,16 @@
    "id": "prop_mask",
    "file": "props/prop_mask.png",
    "w": 12,
-   "h": 12,
+   "h": 18,
    "frames": 1,
    "use": "Map decoration scattered beside the road in districts: theatrum",
-   "desc": "theatre mask. Anchor at bottom centre."
+   "desc": "painted theatre mask on a short stone post. Anchor at bottom centre."
   },
   "prop_arena": {
    "id": "prop_arena",
    "file": "props/prop_arena.png",
-   "w": 32,
-   "h": 16,
+   "w": 44,
+   "h": 24,
    "frames": 1,
    "use": "Map decoration scattered beside the road in districts: theatrum",
    "desc": "small circus/arena oval. Anchor at bottom centre."
@@ -815,17 +821,17 @@
   "landmark_milestone": {
    "id": "landmark_milestone",
    "file": "landmarks/landmark_milestone.png",
-   "w": 10,
-   "h": 18,
+   "w": 17,
+   "h": 23,
    "frames": 1,
    "use": "Map: every rest stop (one per week)",
-   "desc": "Roman milestone (miliarium), cylindrical stone; the week number is drawn on it with font_roman. Anchor at bottom centre."
+   "desc": "Roman milestone (miliarium) with a flat marble inscription field (rows 4-12, columns 1-15); the week number is drawn on it with font_roman. Anchor at bottom centre."
   },
   "landmark_fountain": {
    "id": "landmark_fountain",
    "file": "landmarks/landmark_fountain.png",
-   "w": 24,
-   "h": 20,
+   "w": 30,
+   "h": 25,
    "frames": 1,
    "use": "Map: rest stop (catch-up day), alternates with shrine",
    "desc": "public fountain with a basin and a spout. Anchor at bottom centre."
@@ -833,8 +839,8 @@
   "landmark_shrine": {
    "id": "landmark_shrine",
    "file": "landmarks/landmark_shrine.png",
-   "w": 20,
-   "h": 24,
+   "w": 22,
+   "h": 31,
    "frames": 1,
    "use": "Map: rest stop (catch-up day), alternates with fountain",
    "desc": "small roadside shrine (lararium/aedicula) with a gilded image. Anchor at bottom centre."
@@ -842,11 +848,11 @@
   "landmark_arch": {
    "id": "landmark_arch",
    "file": "landmarks/landmark_arch.png",
-   "w": 48,
-   "h": 40,
+   "w": 56,
+   "h": 44,
    "frames": 1,
    "use": "Map: end of every chapter",
-   "desc": "triumphal arch spanning the road, gold inscription panel on top. Anchor at bottom centre."
+   "desc": "triumphal arch spanning the road; the marble panel in the gold frame on the attic (rows 3-11, columns 10-45) takes the chapter numeral. Anchor at bottom centre."
   },
   "landmark_capitolium": {
    "id": "landmark_capitolium",
@@ -896,62 +902,62 @@
   "coin_as": {
    "id": "coin_as",
    "file": "ui/coin_as.png",
-   "w": 12,
-   "h": 12,
+   "w": 24,
+   "h": 24,
    "frames": 1,
    "use": "Rewards screen: streak coin",
-   "desc": "A bronze as seen face-on, with a simple portrait or emblem."
+   "desc": "A bronze as seen face-on, with a ship's prow."
   },
   "coin_dupondius": {
    "id": "coin_dupondius",
    "file": "ui/coin_dupondius.png",
-   "w": 12,
-   "h": 12,
+   "w": 24,
+   "h": 24,
    "frames": 1,
    "use": "Rewards screen: streak coin",
-   "desc": "A brass dupondius seen face-on, with a simple portrait or emblem."
+   "desc": "A brass dupondius seen face-on, with a radiate head."
   },
   "coin_sestertius": {
    "id": "coin_sestertius",
    "file": "ui/coin_sestertius.png",
-   "w": 12,
-   "h": 12,
+   "w": 24,
+   "h": 24,
    "frames": 1,
    "use": "Rewards screen: streak coin",
-   "desc": "A orichalcum sestertius seen face-on, with a simple portrait or emblem."
+   "desc": "An orichalcum sestertius seen face-on, with a laureate head."
   },
   "coin_quinarius": {
    "id": "coin_quinarius",
    "file": "ui/coin_quinarius.png",
-   "w": 12,
-   "h": 12,
+   "w": 24,
+   "h": 24,
    "frames": 1,
    "use": "Rewards screen: streak coin",
-   "desc": "A small silver quinarius seen face-on, with a simple portrait or emblem."
+   "desc": "A small silver quinarius seen face-on, with a winged Victory."
   },
   "coin_denarius": {
    "id": "coin_denarius",
    "file": "ui/coin_denarius.png",
-   "w": 12,
-   "h": 12,
+   "w": 24,
+   "h": 24,
    "frames": 1,
    "use": "Rewards screen: streak coin",
-   "desc": "A silver denarius seen face-on, with a simple portrait or emblem."
+   "desc": "A silver denarius seen face-on, with a helmeted head."
   },
   "coin_aureus": {
    "id": "coin_aureus",
    "file": "ui/coin_aureus.png",
-   "w": 12,
-   "h": 12,
+   "w": 24,
+   "h": 24,
    "frames": 1,
    "use": "Rewards screen: streak coin",
-   "desc": "A gold aureus seen face-on, with a simple portrait or emblem."
+   "desc": "A gold aureus seen face-on, with a laureate head."
   },
   "icon_tunic": {
    "id": "icon_tunic",
    "file": "ui/icon_tunic.png",
-   "w": 16,
-   "h": 16,
+   "w": 20,
+   "h": 20,
    "frames": 1,
    "use": "UI icon (wardrobe, stats)",
    "desc": "Icon: tunic."
@@ -959,8 +965,8 @@
   "icon_toga": {
    "id": "icon_toga",
    "file": "ui/icon_toga.png",
-   "w": 16,
-   "h": 16,
+   "w": 20,
+   "h": 20,
    "frames": 1,
    "use": "UI icon (wardrobe, stats)",
    "desc": "Icon: folded toga with purple border."
@@ -968,8 +974,8 @@
   "icon_cloak": {
    "id": "icon_cloak",
    "file": "ui/icon_cloak.png",
-   "w": 16,
-   "h": 16,
+   "w": 20,
+   "h": 20,
    "frames": 1,
    "use": "UI icon (wardrobe, stats)",
    "desc": "Icon: travelling cloak."
@@ -977,8 +983,8 @@
   "icon_laurel": {
    "id": "icon_laurel",
    "file": "ui/icon_laurel.png",
-   "w": 16,
-   "h": 16,
+   "w": 20,
+   "h": 20,
    "frames": 1,
    "use": "UI icon (wardrobe, stats)",
    "desc": "Icon: laurel wreath."
@@ -986,8 +992,8 @@
   "icon_satchel": {
    "id": "icon_satchel",
    "file": "ui/icon_satchel.png",
-   "w": 16,
-   "h": 16,
+   "w": 20,
+   "h": 20,
    "frames": 1,
    "use": "UI icon (wardrobe, stats)",
    "desc": "Icon: school satchel."
@@ -995,8 +1001,8 @@
   "icon_streak": {
    "id": "icon_streak",
    "file": "ui/icon_streak.png",
-   "w": 16,
-   "h": 16,
+   "w": 20,
+   "h": 20,
    "frames": 1,
    "use": "UI icon (wardrobe, stats)",
    "desc": "Icon: small flame / hearth for the streak counter."
@@ -1004,8 +1010,8 @@
   "icon_scroll": {
    "id": "icon_scroll",
    "file": "ui/icon_scroll.png",
-   "w": 16,
-   "h": 16,
+   "w": 20,
+   "h": 20,
    "frames": 1,
    "use": "UI icon (wardrobe, stats)",
    "desc": "Icon: scroll for \"words learned\"."
@@ -1033,12 +1039,12 @@
    "id": "font_roman",
    "file": "ui/font_roman.png",
    "w": 5,
-   "h": 7,
+   "h": 9,
    "frames": 7,
    "glyphs": "IVXLCDM",
-   "advance": 6,
+   "advance": 5,
    "use": "Map: Roman numerals on milestones and arches",
-   "desc": "Bitmap font sheet: glyphs I V X L C D M in that order, each 5x7, separated by 1px (sheet 42x7). Dark ink colour."
+   "desc": "Bitmap font sheet: glyphs I V X L C D M in that order. Each cell is 5x9 with no gap (sheet 35x9): ink strokes 3x7 on a marble backing with a shadow line along the bottom, matching the milestone face and the arch panel."
   },
   "app_icon_180": {
    "id": "app_icon_180",
@@ -1047,7 +1053,7 @@
    "h": 180,
    "frames": 1,
    "use": "Home-screen / PWA icon",
-   "desc": "App icon: a laurel wreath around a cream letter L on a terracotta field, pixel-art style (32x32 art upscaled ×5)."
+   "desc": "App icon: a laurel wreath around a cream letter L on a terracotta field, pixel-art style (24x24 art upscaled ×7 on a 180px field)."
   },
   "app_icon_192": {
    "id": "app_icon_192",
@@ -1056,7 +1062,7 @@
    "h": 192,
    "frames": 1,
    "use": "Home-screen / PWA icon",
-   "desc": "App icon: a laurel wreath around a cream letter L on a terracotta field, pixel-art style (32x32 art upscaled ×6)."
+   "desc": "App icon: a laurel wreath around a cream letter L on a terracotta field, pixel-art style (24x24 art upscaled ×8)."
   },
   "app_icon_512": {
    "id": "app_icon_512",
@@ -1065,7 +1071,7 @@
    "h": 512,
    "frames": 1,
    "use": "Home-screen / PWA icon",
-   "desc": "App icon: a laurel wreath around a cream letter L on a terracotta field, pixel-art style (32x32 art upscaled ×16)."
+   "desc": "App icon: a laurel wreath around a cream letter L on a terracotta field, pixel-art style (32x32 art upscaled ×16; the wreath stays inside the maskable safe zone)."
   }
  }
 }
