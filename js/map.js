@@ -1,10 +1,11 @@
 // The Road through Rome: a tall, scrollable pixel-art map drawn on a canvas.
 // Art comes only from assets.json (see art.js). World units are "art pixels".
-import { img, art, meta, drawAt, drawRoman } from './art.js';
+import { img, art, meta, drawAt, drawRoman, romanWidth } from './art.js';
 import { roman, seeded } from './util.js';
 
 const DY = 30;           // vertical distance between stops (art px)
 const TOP = 130, BOTTOM = 90;
+const ROAD_HALF = 9;     // half the road's outer (dark) stroke
 let st = null;           // active map state
 
 export function buildNodes(days) {
@@ -37,24 +38,167 @@ function roadXAt(nodes, y) {
 
 function districtOf(chap) { const m = art(); return m.chapterDistricts[chap - 1] || 'villa'; }
 
-function makeProps(nodes, worldW) {
-  const m = art(); const props = [];
-  const rnd = seeded(31337);
-  for (let y = nodes[0].y + 40; y > nodes[nodes.length - 1].y - 20; y -= 15) {
-    const k = Math.max(0, Math.min(nodes.length - 1, Math.round((nodes[0].y - y) / DY)));
-    const d = m.districts[districtOf(nodes[k].chap)];
-    for (let side = -1; side <= 1; side += 2) {
-      if (rnd() < 0.45) continue;
-      const rx = roadXAt(nodes, y);
-      const x = Math.round(rx + side * (24 + rnd() * (worldW / 2)));
-      if (x < 6 || x > worldW - 6) continue;
-      const id = d.props[Math.floor(rnd() * d.props.length)];
-      const a = meta(id); if (!a) continue;
-      if (Math.abs(x - rx) < a.w / 2 + 14) continue;
-      props.push({ id, x, y: Math.round(y + rnd() * 6) });
-    }
+/** contiguous runs of one district, bottom to top: {d, top, bot} in world y */
+function bandsOf(nodes, H) {
+  const bands = [];
+  for (let i = 0; i < nodes.length; i++) {
+    const n = nodes[i]; const d = districtOf(n.chap);
+    const yTop = n.y - DY / 2, yBot = n.y + DY / 2;
+    if (bands.length && bands[bands.length - 1].d === d) bands[bands.length - 1].top = yTop;
+    else bands.push({ d, top: yTop, bot: i === 0 ? H : yBot });
   }
-  return props;
+  bands[bands.length - 1].top = 0;
+  return bands;
+}
+/** leftmost and rightmost road centre between two heights (yA above yB) */
+function roadSpan(nodes, yA, yB) {
+  let mn = Infinity, mx = -Infinity;
+  for (let y = yA; ; y += 3) {
+    const x = roadXAt(nodes, Math.min(y, yB));
+    if (x < mn) mn = x; if (x > mx) mx = x;
+    if (y >= yB) break;
+  }
+  return [mn, mx];
+}
+// sprites are anchored bottom-centre: the rectangle a w×h sprite covers when drawn at (x, y)
+const box = (x, y, w, h) => ({ x0: x - w / 2, x1: x + w / 2, y0: y - h, y1: y });
+const hit = (a, b, pad = 0) => a.x0 < b.x1 + pad && a.x1 > b.x0 - pad && a.y0 < b.y1 + pad && a.y1 > b.y0 - pad;
+
+/**
+ * Everything that stands on the map, placed once per layout so nothing overlaps:
+ * the Capitol, an arch wherever the chapter changes, a milestone and a fountain or shrine
+ * at every rest stop, then the district's props around them.
+ */
+function buildScene(nodes, worldW, bands) {
+  const fixed = [], solid = [];
+  const dim = id => meta(id) || { w: 0, h: 0 };
+  const top = nodes[nodes.length - 1];
+  const cap = dim('landmark_capitolium');
+  fixed.push({ id: 'landmark_capitolium', x: top.x, y: top.y - 26 });
+  solid.push(box(top.x, top.y - 26, cap.w, cap.h));
+
+  // an arch stands on the district boundary, between the last stop of one chapter and the first of the next
+  const ar = dim('landmark_arch');
+  for (let i = 0; i < nodes.length - 1; i++) {
+    const n = nodes[i], nx = nodes[i + 1];
+    if (nx.chap === n.chap) continue;
+    const x = Math.round((n.x + nx.x) / 2), y = Math.round((n.y + nx.y) / 2) + 6;
+    fixed.push({ id: 'landmark_arch', x, y, text: roman(n.chap) });
+    solid.push(box(x, y, ar.w, ar.h));
+  }
+
+  // x of a sprite standing beside the road, clear of it over the sprite's whole height
+  const beside = (a, side, y, from) => {
+    const [mn, mx] = roadSpan(nodes, y - a.h, y);
+    const edge = side > 0 ? Math.max(mx + ROAD_HALF + 1, from) : Math.min(mn - ROAD_HALF - 1, from);
+    return Math.round(edge + side * a.w / 2);
+  };
+  // stand it beside the road, sliding along the road until it is clear of arches and the Capitol
+  const stand = (id, a, side, y, from = side > 0 ? -1e9 : 1e9) => {
+    let x = beside(a, side, y, from), dir = 0;
+    for (let k = 0; k < 28; k++) {
+      const r = box(x, y, a.w, a.h); const s = solid.find(o => hit(r, o, 2));
+      if (!s) break;
+      if (!dir) dir = (s.y0 + s.y1) / 2 < y - a.h / 2 ? 1 : -1;
+      y += dir; x = beside(a, side, y, from);
+    }
+    return { id, x, y };
+  };
+  const ms = dim('landmark_milestone');
+  const rests = [];
+  for (const n of nodes) {
+    if (n.type !== 'rest') continue;
+    const side = n.x > worldW / 2 ? -1 : 1;           // the roomier side of the road
+    const lid = n.week % 2 ? 'landmark_fountain' : 'landmark_shrine';
+    const lm = dim(lid);
+    // milestone across the road from the fountain or shrine; on the same side when there is no room
+    let m = stand('landmark_milestone', ms, -side, n.y + 6), l;
+    if (m.x - ms.w / 2 >= 1 && m.x + ms.w / 2 <= worldW - 1) l = stand(lid, lm, side, n.y + 4);
+    else {
+      m = stand('landmark_milestone', ms, side, n.y + 6);
+      l = stand(lid, lm, side, n.y + 4, m.x + side * (ms.w / 2 + 2));
+    }
+    m.text = roman(n.week);
+    fixed.push(l, m);
+    rests.push(box(l.x, l.y, lm.w, lm.h), box(m.x, m.y, ms.w, ms.h));
+  }
+  solid.push(...rests);
+  return { fixed, props: makeProps(nodes, worldW, bands, solid) };
+}
+
+function makeProps(nodes, worldW, bands, solid) {
+  const m = art(); const all = [];
+  let cur = [], prev = [];
+  const MINOR = 24;                                     // narrower than this is street furniture, not a building
+  const full = p => box(p.x, p.y, p.w, p.h);
+  // the strip of ground a prop stands on; two props may overlap in depth but not share ground
+  const foot = p => ({ x0: p.x - p.w / 2, x1: p.x + p.w / 2, y0: p.y - Math.max(5, Math.min(18, Math.round(p.h * 0.45))), y1: p.y });
+  const ok = (c, pad = 1) => {
+    const [mn, mx] = roadSpan(nodes, c.y - c.h, c.y + 1);
+    if (c.x - c.w / 2 < mx + ROAD_HALF + 2 && c.x + c.w / 2 > mn - ROAD_HALF - 2) return false;   // clear of the road, top to bottom
+    const fr = full(c);
+    if (solid.some(o => hit(fr, o, 2))) return false;                                             // clear of landmarks
+    const ff = foot(c);
+    for (const list of [cur, prev]) for (const e of list) {
+      if (!hit(fr, full(e))) continue;
+      if (hit(ff, foot(e), pad)) return false;
+      if (c.w < MINOR && c.y <= e.y) return false;          // small things do not hide behind bigger ones
+      if (e.w < MINOR && c.w >= MINOR && c.y > e.y) return false;
+    }
+    return true;
+  };
+  // loose props either side of the road (the countryside), or close to it (street life in a city)
+  const scatter = (b, list, rnd, density, street) => {
+    if (!list || !list.length) return;
+    for (let y = b.bot - 2; y > b.top + 3; y -= street ? 11 : 15) for (let side = -1; side <= 1; side += 2) {
+      if (rnd() >= density) continue;
+      const id = list[Math.floor(rnd() * list.length)];
+      const a = meta(id); if (!a) continue;
+      for (let t = 0; t < 3; t++) {
+        const off = street ? ROAD_HALF + 3 + a.w / 2 + rnd() * rnd() * 50 : 24 + rnd() * (worldW / 2);
+        const yy = Math.round(y + rnd() * 6);
+        const c = { id, w: a.w, h: a.h, x: Math.round(roadXAt(nodes, yy) + side * off), y: yy };
+        if (c.x < 6 || c.x > worldW - 6) continue;
+        if (a.w >= 40 && [...cur, ...prev].some(e => e.id === id && Math.abs(e.y - c.y) < 120)) break;   // one big building of a kind per screenful
+        if (ok(c)) { cur.push(c); break; }
+      }
+    }
+  };
+  // rows of buildings shoulder to shoulder, leaving a pavement beside the road, alleys and the odd small square.
+  // Each row stands far enough behind the one in front that its upper floors show above the roofs.
+  const city = (b, d, rnd) => {
+    const open = d.open ?? 0.1;
+    for (let side = -1; side <= 1; side += 2) {
+      let y = b.bot - 3 - Math.floor(rnd() * 8);
+      while (y > b.top + 12) {
+        let cursor = side > 0 ? -1e9 : 1e9, tallest = 0;
+        const pavement = 12 + Math.floor(rnd() * 5);
+        for (let k = 0; k < 9; k++) {
+          const id = d.buildings[Math.floor(rnd() * d.buildings.length)];
+          const a = meta(id); if (!a) continue;
+          const yy = y - Math.floor(rnd() * 3);
+          const [mn, mx] = roadSpan(nodes, yy - a.h, yy + 1);
+          const edge = side > 0 ? Math.max(mx + ROAD_HALF + pavement, cursor) : Math.min(mn - ROAD_HALF - pavement, cursor);
+          const c = { id, w: a.w, h: a.h, x: Math.round(edge + side * a.w / 2), y: yy };
+          const outside = side > 0 ? c.x + a.w / 2 - worldW : a.w / 2 - c.x;
+          if (outside > a.w * 0.45) break;                               // mostly off the edge of the map
+          if (rnd() < open) { cursor = edge + side * (18 + rnd() * 14); continue; }
+          if (ok(c, 0)) { cur.push(c); tallest = Math.max(tallest, a.h); cursor = edge + side * (a.w + (rnd() < 0.3 ? 3 + Math.floor(rnd() * 5) : 0)); }
+          else cursor = edge + side * 8;
+        }
+        y -= Math.max(26, Math.round(tallest * 0.8)) + 3 + Math.floor(rnd() * 5);
+      }
+    }
+  };
+  bands.forEach((b, i) => {
+    const d = m.districts[b.d]; if (!d) return;
+    const rnd = seeded(31337 + i * 7919);
+    prev = cur; cur = [];
+    if (d.buildings && d.buildings.length) { city(b, d, rnd); scatter(b, d.props, rnd, d.density ?? 0.7, true); }
+    else scatter(b, d.props, rnd, d.density ?? 0.6, false);
+    all.push(...cur);
+  });
+  return all;
 }
 
 export function mountMap(container, { days, nodes, statusOf, heroNode, outfit, onTap, onScroll }) {
@@ -92,7 +236,9 @@ function resize() {
   st.worldW = Math.ceil(vw / st.scale);
   const keepNode = st.hero ? st.hero.node : st.heroNode;
   st.H = layout(st.nodes, st.worldW);
-  st.props = makeProps(st.nodes, st.worldW);
+  st.bands = bandsOf(st.nodes, st.H);
+  const scene = buildScene(st.nodes, st.worldW, st.bands);
+  st.props = scene.props; st.fixed = scene.fixed;
   st.spacer.style.height = (st.H * st.scale) + 'px';
   st.canvas.width = Math.round(vw * dpr); st.canvas.height = Math.round(vh * dpr);
   st.canvas.style.width = vw + 'px'; st.canvas.style.height = vh + 'px';
@@ -141,14 +287,7 @@ function render() {
   ctx.imageSmoothingEnabled = false;
 
   // 1) district bands
-  const bands = [];
-  for (let i = 0; i < nodes.length; i++) {
-    const n = nodes[i]; const d = districtOf(n.chap);
-    const yTop = n.y - DY / 2, yBot = n.y + DY / 2;
-    if (bands.length && bands[bands.length - 1].d === d) bands[bands.length - 1].top = yTop;
-    else bands.push({ d, top: yTop, bot: i === 0 ? st.H : yBot });
-  }
-  bands[bands.length - 1].top = 0;
+  const bands = st.bands;
   for (const b of bands) {
     if (b.bot < y0 || b.top > y1) continue;
     const p = pattern('bg_' + b.d);
@@ -174,39 +313,11 @@ function render() {
     path(); ctx.strokeStyle = pattern('tile_via') || '#8a847a'; ctx.lineWidth = 14; ctx.stroke();
   }
 
-  // 3) props + landmarks, depth-sorted by y
+  // 3) props and landmarks, depth-sorted by y
   const items = [];
-  for (const p of st.props) if (p.y > y0 - 10 && p.y - 40 < y1) items.push({ y: p.y, f: () => drawAt(ctx, p.id, p.x, p.y) });
-  for (let i = 0; i < nodes.length; i++) {
-    const n = nodes[i];
-    if (n.y < y0 - 60 || n.y > y1 + 60) continue;
-    if (n.type === 'rest') {
-      const side = n.x > st.worldW / 2 ? -1 : 1;
-      const lid = n.week % 2 ? 'landmark_fountain' : 'landmark_shrine';
-      items.push({ y: n.y + 4, f: () => drawAt(ctx, lid, n.x + side * 26, n.y + 4) });
-      items.push({ y: n.y + 6, f: () => { drawAt(ctx, 'landmark_milestone', n.x - side * 16, n.y + 6); } });
-    }
-    if (n.type === 'read' && n.chEnd) {
-      const nx = nodes[i + 1] || n;
-      const ax = (n.x + nx.x) / 2, ay = (n.y + nx.y) / 2 + 6;
-      items.push({ y: ay, f: () => {
-        drawAt(ctx, 'landmark_arch', ax, ay);
-        const a = meta('landmark_arch'); if (a) drawRoman(ctx, roman(n.chap), ax, ay - a.h + 3);
-      } });
-    }
-  }
-  const top = nodes[nodes.length - 1];
-  items.push({ y: top.y - 26, f: () => drawAt(ctx, 'landmark_capitolium', top.x, top.y - 26) });
+  for (const p of st.props) if (p.y > y0 - 4 && p.y - p.h < y1) items.push({ y: p.y, f: () => drawAt(ctx, p.id, p.x, p.y) });
+  for (const f of st.fixed) if (f.y > y0 - 4 && f.y - 100 < y1) items.push({ y: f.y, f: () => drawFixed(ctx, f) });
   items.sort((a, b) => a.y - b.y).forEach(it => it.f());
-  // milestone numerals on top
-  for (const n of nodes) {
-    if (n.type !== 'rest' || n.y < y0 - 30 || n.y > y1 + 30) continue;
-    const side = n.x > st.worldW / 2 ? -1 : 1;
-    const a = meta('landmark_milestone');
-    const txt = roman(n.week);
-    if (a && txt.length <= 3) drawRoman(ctx, txt, n.x - side * 16, n.y + 6 - a.h + 4);
-    else if (a) { drawRoman(ctx, txt, n.x - side * 16, n.y + 6 - a.h - 6); }
-  }
 
   // 4) waypoints
   for (const n of vis) {
@@ -217,7 +328,7 @@ function render() {
     ctx.globalAlpha = 1;
   }
 
-  // 5) hero
+  // 5) hero, always in front: a chapter's first stop is right behind its arch, and he must stay in view there
   const h = st.hero;
   if (h && h.y > y0 - 30 && h.y < y1 + 30) {
     const a = meta('hero_base');
@@ -230,6 +341,23 @@ function render() {
     drawAt(ctx, 'hero_base', h.x, h.y + 2, { frame, row });
     for (const o of st.outfit || []) drawAt(ctx, 'hero_' + o, h.x, h.y + 2, { frame, row });
   }
+}
+
+/** a landmark, with its Roman numeral carved on the face named in assets.json (`face`: [x, y, w, h] inside the sprite) */
+function drawFixed(ctx, f) {
+  drawAt(ctx, f.id, f.x, f.y);
+  if (!f.text) return;
+  const a = meta(f.id), fa = meta('font_roman'); if (!a || !fa) return;
+  const [fx, fy, fw, fh] = a.face || [0, 0, a.w, a.h];
+  let lines = [f.text];
+  if (romanWidth(f.text) > fw) {                       // too long for one line: tens above, units below
+    const m = f.text.match(/^(.*?)(IX|IV|V?I{0,3})$/);
+    if (m && m[1] && m[2]) lines = [m[1], m[2]];
+  }
+  const total = lines.length * fa.h + (lines.length - 1) * 2;
+  const cx = Math.round(f.x - a.w / 2) + fx + fw / 2;
+  let y = Math.round(f.y - a.h) + fy + Math.max(0, Math.floor((fh - total) / 2));
+  for (const ln of lines) { drawRoman(ctx, ln, cx, y); y += fa.h + 2; }
 }
 
 /** animate the hero from its node to node `to` (through intermediate stops) */

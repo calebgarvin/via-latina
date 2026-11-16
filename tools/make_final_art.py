@@ -1551,33 +1551,487 @@ def build_props():
         im = fn(); asset(aid, im, w=im.size[0], h=im.size[1], frames=1)
 BUILDERS.append(build_props)
 
+# ================================================================== CITY
+# Buildings and street life for the districts that lie inside Rome. In assets.json a district
+# with a `buildings` list is laid out as a city: rows of these shoulder to shoulder, with the
+# district's `props` (people, carts, lamps) on the pavement. Monuments also appear as props.
+def window(cv, x, y, w=4, h=6, sill='t', shutter=None):
+    cv.rect(x, y, x + w - 1, y + h - 1, 'k'); cv.rect(x + 1, y + 1, x + w - 2, y + h - 2, 'B')
+    if shutter: cv.vline(x + 1, y + 1, y + h - 2, shutter)
+    if sill: cv.hline(x - 1, x + w, y + h, sill)
+
+def arched(cv, x0, x1, ytop, ybot, fill='B', frame='k'):
+    """round-headed opening from x0 to x1 with its crown at ytop"""
+    def shape(a, b, top, c):
+        r = (b - a + 1) / 2; cx = (a + b) / 2
+        for y in range(top, ybot + 1):
+            for x in range(a, b + 1):
+                if y < top + r and (x - cx) ** 2 + (top + r - y - .5) ** 2 > r * r: continue
+                cv.set(x, y, c)
+    if frame: shape(x0 - 1, x1 + 1, ytop - 1, frame)
+    shape(x0, x1, ytop, fill)
+
+def insula():
+    """apartment block (insula): shops at street level, a timber balcony, three floors of small windows"""
+    W, H = 42, 60
+    cv = Cv(W, H)
+    cv.rect(2, 7, 39, 59, 'k'); cv.rect(3, 8, 38, 58, 'c'); cv.rect(34, 8, 38, 58, 'p')
+    cv.hline(3, 38, 8, 'n'); cv.hline(3, 38, 9, 'p')
+    for y in (21, 33): cv.hline(3, 38, y, 'n')                                    # string courses
+    for fy in (11, 23):                                                           # two floors of windows
+        for i, wx in enumerate((6, 14, 24, 32)):
+            window(cv, wx, fy, 4, 6, shutter='l' if (i + fy) % 3 == 0 else None)
+    cv.grid(23, 30, "wAwwx\nw.w.x")                                               # washing hung out to dry
+    for wx in (7, 19, 31): cv.rect(wx, 35, wx + 3, 42, 'k'); cv.rect(wx + 1, 36, wx + 2, 42, 'B')   # doors onto the balcony
+    cv.rect(1, 40, 40, 45, 'k'); cv.hline(2, 39, 40, 'l')                         # balcony (maenianum)
+    for y in (41, 42, 43):
+        for x in range(2, 40): cv.set(x, y, 'k' if x % 3 == 0 else ('B' if x > 34 else 'b'))
+    cv.hline(2, 39, 44, 'B')
+    for x in (5, 20, 36): cv.grid(x, 46, "BB\n.B")                                # brackets
+    cv.rect(3, 52, 38, 58, 'r'); cv.hline(3, 38, 52, 'o'); cv.rect(34, 53, 38, 58, 'R')             # red dado
+    for a, b in ((5, 16), (25, 36)):                                              # two shops
+        cv.rect(a, 47, b, 59, 'k'); cv.rect(a + 1, 50, b - 1, 58, 'B'); cv.hline(a + 1, b - 1, 48, 'l'); cv.hline(a + 1, b - 1, 49, 'b')
+    for x in (7, 10, 13): cv.rect(x, 51, x + 1, 53, 'r'); cv.set(x, 51, 'o'); cv.set(x, 50, 'R')    # amphorae on a shelf
+    cv.hline(6, 15, 54, 'b'); cv.hline(6, 15, 55, 'm'); cv.rect(6, 56, 15, 58, 'S'); cv.rect(13, 56, 15, 58, 's')
+    cv.grid(27, 51, "o.o.o.o\nr.r.r.r")                                           # sausages on a rail
+    cv.grid(27, 54, "ny.nyy\nyylyyl"); cv.hline(26, 35, 56, 'l'); cv.rect(26, 57, 35, 58, 'b')      # loaves on a table
+    cv.rect(19, 48, 22, 59, 'k'); cv.rect(20, 49, 21, 58, 'b'); cv.vline(20, 49, 58, 'l')           # stair door
+    tiled_roof(cv, 0, 41, 0, 7, 3)
+    return cv.img('insula')
+
+def insula_b():
+    """smaller apartment block in bare brick with travertine string courses and an arched shop"""
+    W, H = 34, 50
+    cv = Cv(W, H)
+    cv.rect(1, 6, 32, 49, 'k')
+    for y in range(7, 49):
+        for x in range(2, 32):
+            c = 'r' if y % 3 == 0 else 'o'
+            if x > 27: c = 'R' if c == 'r' else 'r'
+            cv.set(x, y, c)
+    cv.hline(2, 31, 7, 'R')
+    for y in (21, 35): cv.hline(2, 31, y, 'm'); cv.hline(2, 31, y + 1, 'S'); cv.set(31, y, 'M')
+    for fy in (10, 24):
+        for wx in (5, 15, 25):
+            cv.hline(wx - 1, wx + 4, fy - 1, 'R'); window(cv, wx, fy, 4, 7, sill='m')
+    cv.grid(4, 29, ".v.e..\nvevvev")                                              # herbs in a window box
+    arched(cv, 4, 17, 38, 49, 'B', 'k')
+    for x in (7, 10, 13): cv.rect(x, 42, x + 1, 44, 'y'); cv.set(x, 42, 'n'); cv.set(x + 1, 44, 'z')
+    cv.hline(5, 16, 45, 'm'); cv.rect(5, 46, 16, 48, 'S'); cv.rect(14, 46, 16, 48, 's')
+    arched(cv, 22, 27, 40, 49, 'b', 'k'); cv.vline(22, 43, 48, 'l'); cv.vline(25, 41, 48, 'B')
+    cv.hline(1, 32, 49, 'k')
+    tiled_roof(cv, 0, 33, 0, 6, 3)
+    return cv.img('insula_b')
+
+def domus():
+    """town house (domus): a blind street wall with a tall doorway, the atrium roof rising behind"""
+    W, H = 54, 34
+    cv = Cv(W, H)
+    cv.rect(15, 6, 38, 14, 'k'); cv.rect(16, 7, 37, 14, 'p'); cv.hline(16, 37, 7, 'n')              # atrium block
+    for wx in (19, 33): cv.rect(wx, 9, wx + 1, 10, 'B')
+    tiled_roof(cv, 13, 40, 0, 6, 4)
+    cv.rect(24, 1, 29, 3, 'k'); cv.rect(25, 2, 28, 3, 'K')                                          # the compluvium, open to the sky
+    cv.rect(2, 19, 51, 33, 'k'); cv.rect(3, 20, 50, 32, 'c'); cv.rect(46, 20, 50, 32, 'p'); cv.hline(3, 50, 20, 'n')
+    cv.rect(3, 27, 50, 32, 'r'); cv.hline(3, 50, 27, 'o'); cv.rect(46, 28, 50, 32, 'R')
+    tiled_roof(cv, 0, 53, 12, 19, 3)
+    cv.rect(20, 20, 33, 33, 'k'); cv.rect(21, 21, 32, 32, 'm'); cv.vline(32, 21, 32, 'S'); cv.vline(31, 23, 32, 'M')   # stone door case
+    cv.rect(23, 23, 30, 32, 'k'); cv.rect(24, 24, 29, 32, 'b'); cv.vline(24, 24, 32, 'l'); cv.vline(26, 24, 32, 'B'); cv.vline(27, 24, 32, 'l')
+    for y in (26, 30): cv.set(25, y, 'g'); cv.set(28, y, 'g')
+    for wx in (7, 13, 38, 44): cv.rect(wx, 22, wx + 2, 24, 'k'); cv.set(wx + 1, 23, 'B')            # high slit windows
+    cv.rect(35, 29, 42, 32, 'k'); cv.hline(36, 41, 30, 'm'); cv.hline(36, 41, 31, 'S'); cv.hline(37, 40, 32, 'R')     # stone bench
+    cv.grid(13, 25, ".vev.\nvGvev\nvvGvv\n.vGv.\n..B..\n.oor.\n.orR.")                              # laurel in a tub
+    return cv.img('domus')
+
+def thermae():
+    """public baths: a vaulted hall with a great lunette window, a domed hot room and a furnace flue"""
+    W, H = 60, 46
+    cv = Cv(W, H)
+    cv.rect(1, 22, 58, 45, 'k'); cv.rect(2, 23, 57, 44, 'c'); cv.rect(52, 23, 57, 44, 'p'); cv.hline(2, 57, 23, 'n')
+    for y in range(8, 23):                                                        # dome of the caldarium
+        for x in range(1, 19):
+            r = math.hypot((x - 9.5) / 8.6, (y - 22.5) / 13.5)
+            if r <= 1: cv.set(x, y, 'k' if r > .89 else 'w' if (x - 6) ** 2 + (y - 14) ** 2 < 5 else 'm' if x < 9 else 'M' if x < 13 else 'S')
+    cv.grid(8, 7, ".kk.\nkmSk")
+    tiled_roof(cv, 42, 59, 16, 22, 2)                                             # lean-to over the furnace room
+    cv.rect(49, 7, 54, 17, 'k'); cv.rect(50, 8, 53, 16, 'o'); cv.vline(53, 8, 16, 'r')
+    for y in (10, 13): cv.hline(50, 53, y, 'r')
+    cv.grid(48, 0, "...mm.\n.mmSSm\nmSSmS.\n.mSSm.\n..SmS.\n...S..\n..mS..")           # smoke
+    cv.rect(17, 8, 42, 45, 'k'); cv.rect(18, 9, 41, 44, 'c'); cv.rect(37, 9, 41, 44, 'p'); cv.hline(18, 41, 9, 'n')   # the great hall
+    for y in range(13, 28):
+        for x in range(18, 42):
+            d = math.hypot(x - 29.5, y - 27.5)
+            if d > 11.3: continue
+            if d > 10.3: c = 'k'
+            elif d > 8.6: c = 'o' if (x + y) % 3 else 'r'
+            elif d > 7.7: c = 'k'
+            else: c = 'A' if (x + y) % 7 == 0 else 'a' if (x - y) % 5 == 0 else 'N'
+            cv.set(x, y, c)
+    for x in (26, 33): cv.vline(x, 20, 27, 'c')                                   # mullions
+    cv.hline(18, 41, 28, 'k'); cv.hline(19, 40, 29, 'm'); cv.hline(19, 40, 30, 'S')
+    cv.rect(24, 32, 35, 45, 'k'); cv.rect(25, 33, 34, 44, 'm'); cv.vline(34, 33, 44, 'S')
+    cv.rect(27, 35, 32, 44, 'k'); cv.rect(28, 36, 31, 44, 'z'); cv.vline(29, 36, 44, 'B'); cv.vline(30, 36, 44, 'y')
+    for a in (4, 10, 45, 51): arched(cv, a, a + 3, 28, 35, 'N', 'k'); cv.set(a + 1, 30, 'a')
+    cv.rect(2, 40, 23, 44, 'S'); cv.hline(2, 23, 40, 'm'); cv.rect(36, 40, 57, 44, 'S'); cv.hline(36, 57, 40, 'm'); cv.rect(52, 41, 57, 44, 's')
+    tiled_roof(cv, 15, 44, 1, 8, 6)
+    return cv.img('thermae')
+
+def basilica():
+    """basilica (law court and exchange): two storeys of marble arcades under a long tiled roof"""
+    W, H = 68, 46
+    cv = Cv(W, H)
+    cv.rect(2, 8, 65, 41, 'k'); cv.rect(3, 9, 64, 41, 'm'); cv.rect(59, 9, 64, 41, 'M')
+    cv.hline(3, 64, 9, 'w'); cv.hline(3, 64, 10, 'S')
+    for i in range(6):
+        x = 6 + i * 10
+        arched(cv, x, x + 5, 13, 21, 'D', 'k'); cv.hline(x, x + 5, 21, 'k'); cv.hline(x, x + 5, 20, 's')
+        arched(cv, x, x + 5, 28, 41, 'B', 'k'); cv.set(x + 2, 31, 'D'); cv.set(x + 3, 33, 'D')
+    for x in (3, 13, 23, 33, 43, 53, 63):                                         # half-columns on the piers
+        for y0, y1 in ((12, 21), (27, 41)):
+            cv.vline(x, y0, y1, 'w'); cv.vline(x + 1, y0, y1, 'M' if x < 59 else 'S')
+    cv.rect(2, 22, 65, 26, 'k'); cv.hline(3, 64, 23, 'w'); cv.hline(3, 64, 24, 'm'); cv.hline(3, 64, 25, 'M')
+    for x in range(5, 64, 3): cv.set(x, 24, 'S')
+    tiled_roof(cv, 0, 67, 0, 8, 5)
+    steps(cv, 2, 65, 42, 2, grow=1)
+    return cv.img('basilica')
+
+MILL = """
+.kkkkk.
+kDssSSk
+kDssSSk
+.kDsSk.
+bbkDkbb
+.kDsSk.
+kDssSSk
+kDsssSk
+kkkkkkk
+kDDDDsk
+kkkkkkk
+"""
+def pistrinum():
+    """bakery (pistrinum): a domed brick oven with a fire in its mouth, loaves on the shelves, lava mills in the yard"""
+    W, H = 42, 37
+    cv = Cv(W, H)
+    cv.rect(2, 7, 39, 28, 'k'); cv.rect(3, 8, 38, 27, 'c'); cv.rect(34, 8, 38, 27, 'p'); cv.hline(3, 38, 8, 'n'); cv.hline(3, 38, 9, 'p')
+    for y in range(10, 28):                                                       # the oven
+        for x in range(3, 22):
+            d = math.hypot(x - 12, (y - 27) * .95)
+            if d > 9.4: continue
+            c = 'k' if d > 8.5 else ('o' if (x + y * 2) % 4 else 'r')
+            if d <= 4.7: c = 'k' if d > 3.8 else 'K'
+            cv.set(x, y, c)
+    cv.grid(10, 24, ".gE.\ngEEg\nxgEg\nxxgx")
+    cv.rect(23, 12, 36, 28, 'k'); cv.rect(24, 13, 35, 27, 'B')                     # the shop
+    for sy in (16, 20):
+        cv.hline(24, 35, sy, 'b')
+        for x in (25, 29, 33): cv.grid(x, sy - 2, "ny\nyl")
+    cv.hline(24, 35, 23, 'm'); cv.rect(24, 24, 35, 27, 'S'); cv.rect(33, 24, 35, 27, 's')
+    tiled_roof(cv, 0, 41, 2, 8, 3)
+    cv.rect(9, 0, 14, 5, 'k'); cv.rect(10, 1, 13, 4, 'o'); cv.vline(13, 1, 4, 'r'); cv.hline(10, 13, 3, 'r')    # chimney
+    cv.grid(0, 26, MILL); cv.grid(17, 26, MILL)
+    cv.grid(29, 30, ".kkkk.\nknnntk\nknnttk\nknnttk\nkntttk\n.kkkk.")                # a sack of grain
+    return cv.img('pistrinum')
+
+def tholos():
+    """round temple (like Vesta's): a ring of columns under a conical roof with a gilded finial"""
+    W, H = 36, 42
+    cv = Cv(W, H)
+    for y in range(3, 14):
+        half = round(2 + (y - 3) * 1.5)
+        xa, xb = 18 - half, 17 + half
+        for x in range(xa, xb + 1):
+            c = 'o' if x < 15 else 'r' if x < 24 else 'R'
+            if any(round(17.5 + half * t) == x for t in (-.62, -.3, 0, .3, .62)): c = {'o': 'r', 'r': 'R', 'R': 'W'}[c]   # ribs down the cone
+            cv.set(x, y, 'k' if x in (xa, xb) else c)
+    cv.grid(16, 0, ".kk.\nkgEk\nkgyk")
+    cv.rect(3, 18, 32, 35, 'S'); cv.rect(3, 18, 32, 19, 's'); cv.vline(8, 18, 35, 's'); cv.vline(27, 18, 35, 's')
+    cv.rect(15, 22, 20, 35, 'k'); cv.rect(16, 23, 19, 35, 'z'); cv.vline(17, 23, 35, 'B'); cv.vline(18, 23, 35, 'y')
+    for x in (2, 9, 21, 28): temple_column(cv, x, 18, 35)
+    cv.rect(1, 14, 34, 17, 'k'); cv.hline(2, 33, 15, 'w'); cv.hline(2, 33, 16, 'M')
+    for x in range(4, 33, 3): cv.set(x, 16, 'S')
+    for i, (a, b) in enumerate(((2, 33), (1, 34), (0, 35))):
+        y = 36 + i * 2
+        cv.hline(a, b, y, 'm'); cv.hline(a, b, y + 1, 'S'); cv.hline(b - 3, b - 1, y, 'M')
+        for yy in (y, y + 1): cv.set(a, yy, 'k'); cv.set(b, yy, 'k')
+    cv.hline(0, 35, 41, 'k')
+    return cv.img('tholos')
+
+def portico():
+    """a stretch of colonnade (porticus) under a tiled roof"""
+    W, H = 46, 30
+    cv = Cv(W, H)
+    cv.rect(1, 12, 44, 27, 'k'); cv.rect(2, 13, 43, 27, 'S'); cv.rect(2, 13, 43, 15, 's')
+    for x in (13, 31): cv.rect(x, 18, x + 3, 27, 'k'); cv.rect(x + 1, 19, x + 2, 27, 'D')
+    for x in (2, 11, 20, 29, 38): temple_column(cv, x, 13, 27)
+    cv.rect(0, 8, 45, 12, 'k'); cv.hline(1, 44, 9, 'w'); cv.hline(1, 44, 10, 'm'); cv.hline(1, 44, 11, 'S')
+    tiled_roof(cv, 0, 45, 0, 7, 2)
+    cv.hline(0, 45, 28, 'm'); cv.hline(40, 44, 28, 'M'); cv.set(0, 28, 'k'); cv.set(45, 28, 'k'); cv.hline(0, 45, 29, 'k')
+    return cv.img('portico')
+
+def aqueduct():
+    """three arches of an aqueduct carrying its covered water channel; the ground shows through"""
+    W, H = 54, 46
+    cv = Cv(W, H)
+    for y in range(H):
+        for x in range(W):
+            c = 'S'
+            if y % 5 == 4: c = 's'
+            elif (x + (3 if (y // 5) % 2 else 0)) % 6 == 0: c = 's'
+            if x % 16 in (4, 5): c = 'D' if c == 's' else 's'                       # shaded side of each pier
+            cv.set(x, y, c)
+    cv.rect(0, 0, 53, 8, 'k'); cv.hline(1, 52, 1, 'm'); cv.rect(1, 2, 52, 5, 'S'); cv.hline(1, 52, 6, 's'); cv.hline(1, 52, 7, 'm')
+    for x in range(4, 52, 6): cv.set(x, 3, 's'); cv.set(x, 4, 's')
+    for a in (6, 22, 38): arched(cv, a, a + 9, 13, 45, '.', 'k')
+    cv.vline(0, 0, 45, 'k'); cv.vline(53, 0, 45, 'k')
+    for a in (0, 16, 32, 48): cv.hline(a, a + 5, 45, 'k')
+    for x, y in ((2, 20), (18, 33), (35, 15), (50, 28), (19, 12)): cv.set(x, y, 'v'); cv.set(x + 1, y + 1, 'e')
+    return cv.img('aqueduct')
+
+def theatre():
+    """theatre: the curved outer wall of the seating, two tiers of arcades below a plain attic"""
+    W = 60
+    fl = Cv(W, 40)
+    fl.rect(0, 0, W - 1, 39, 'p')
+    fl.hline(0, W - 1, 0, 'k'); fl.hline(0, W - 1, 1, 'c')
+    for y, c in ((8, 'c'), (9, 'n'), (22, 'c'), (23, 'n'), (24, 't')): fl.hline(0, W - 1, y, c)
+    x = 4
+    for wdt in (4, 6, 6, 6, 6, 4):
+        a, b = x, x + wdt - 1
+        arched(fl, a, b, 12, 20, 'D', 'k'); fl.hline(a, b, 20, 's')
+        arched(fl, a, b, 27, 39, 'B', 'k')
+        fl.rect((a + b) // 2, 3, (a + b) // 2 + 1, 5, 'B')                                           # attic windows
+        x = b + 5
+    # half-columns on the piers
+    x = 4
+    for wdt in (4, 6, 6, 6, 6, 4):
+        fl.vline(x - 3, 10, 21, 'c'); fl.vline(x - 3, 25, 39, 'c')
+        x += wdt + 4
+    fl.vline(x - 3, 10, 21, 'c'); fl.vline(x - 3, 25, 39, 'c')
+    cv = Cv(W, 42)
+    for x in range(W):
+        drop = 2 - round(2 * (abs(x - 29.5) / 29.5) ** 2)                                            # the wall curves away at both ends
+        for y in range(40):
+            c = fl.get(x, y)
+            if x >= 47 or x <= 1: c = {'c': 'p', 'p': 'n', 'n': 't', 't': 'l'}.get(c, c)
+            elif 10 <= x <= 26: c = {'p': 'c'}.get(c, c) if y < 8 or 9 < y < 22 else c
+            cv.set(x, y + drop, c)
+        cv.set(x, 39 + drop, 'k' if cv.get(x, 39 + drop) != 'B' else 'K')
+    for y in range(42):
+        if cv.get(0, y) != '.': cv.set(0, y, 'k')
+        if cv.get(W - 1, y) != '.': cv.set(W - 1, y, 'k')
+    return cv.img('theatre')
+
+def obelisk():
+    """obelisk of red granite with a gilded tip, as on the spina of the Circus"""
+    W, H = 12, 46
+    cv = Cv(W, H)
+    cv.grid(3, 0, "..kk..\n.kEgk.\n.kEgk.\nkEggyk")
+    for y in range(4, 38):
+        half = 2 if y < 21 else 3
+        xa, xb = 6 - half, 5 + half
+        cv.set(xa - 1, y, 'k'); cv.set(xb + 1, y, 'k')
+        for x in range(xa, xb + 1): cv.set(x, y, 'o' if x == xa else 'R' if x == xb else 'r')
+    for y in range(7, 35, 5): cv.set(5, y, 'R'); cv.set(6, y + 1, 'R'); cv.set(5, y + 2, 'o')        # hieroglyphs
+    cv.rect(1, 38, 10, 45, 'k'); cv.rect(2, 39, 9, 44, 'm'); cv.vline(9, 39, 44, 'S'); cv.vline(8, 40, 44, 'M'); cv.hline(2, 9, 39, 'w')
+    cv.rect(0, 43, 11, 45, 'k'); cv.hline(1, 10, 44, 'S'); cv.set(1, 44, 'm'); cv.set(2, 44, 'm')
+    return cv.img('obelisk')
+
+def columna():
+    """honorary column: reliefs winding up the shaft, a gilded statue on top"""
+    W, H = 16, 56
+    cv = Cv(W, H)
+    cv.grid(5, 0, "..kk..\n.kgEk.\n.kgyk.\nkgEgyk\nkgEgyk\n.kgyk.\n.kgyk.\n.kyyk.")
+    cv.rect(3, 8, 12, 10, 'k'); cv.hline(4, 11, 9, 'm'); cv.set(11, 9, 'S'); cv.set(4, 9, 'w')
+    for y in range(11, 44):
+        cv.set(4, y, 'k'); cv.set(11, y, 'k')
+        for x in range(5, 11):
+            c = "wmmmMS"[x - 5]
+            if (x + y) % 5 == 0: c = {'w': 'M', 'm': 'M', 'M': 'S', 'S': 's'}[c]
+            cv.set(x, y, c)
+    cv.rect(2, 44, 13, 46, 'k'); cv.hline(3, 12, 45, 'm'); cv.set(12, 45, 'S')
+    cv.rect(1, 46, 14, 55, 'k'); cv.rect(2, 47, 13, 54, 'm'); cv.rect(11, 47, 13, 54, 'S'); cv.hline(2, 13, 47, 'w')
+    cv.rect(6, 50, 9, 55, 'k'); cv.rect(7, 51, 8, 54, 'z')
+    cv.hline(0, 15, 55, 'k')
+    return cv.img('columna')
+
+def rostra():
+    """the Rostra: the speakers' platform in the Forum, its front hung with the bronze rams of captured ships"""
+    W, H = 46, 22
+    cv = Cv(W, H)
+    cv.rect(2, 0, 43, 6, 'k'); cv.hline(3, 42, 1, 'w')
+    for y in (2, 3, 4):
+        for x in range(3, 43): cv.set(x, y, 'k' if x % 3 == 0 else ('M' if x > 38 else 'm'))
+    cv.hline(3, 42, 5, 'M')
+    cv.rect(1, 6, 44, 21, 'k'); cv.rect(2, 7, 43, 20, 'm'); cv.rect(39, 7, 43, 20, 'M'); cv.hline(2, 43, 7, 'w'); cv.rect(2, 19, 43, 20, 'S')
+    for x in (5, 15, 25, 35):
+        cv.rect(x - 1, 9, x + 5, 17, 'M'); cv.grid(x, 10, ".kkk.\nkgEgk\nkzgzk\nkzzzk\n.kzk.\n..k..")
+    return cv.img('rostra')
+
+ALTAR = """
+.....xg
+....xgEo
+...kogEgxk
+.kkkkkkkkkkk
+.kwmmmmmmMSk
+..kkkkkkkkk
+..kwmmmmMSk
+..kvevevemk
+..kwmxmmMSk
+..kwmmmmMSk
+..kwmmmmMSk
+.kkkkkkkkkkk
+.kwmmmmmmMSk
+kkkkkkkkkkkkk
+kwMMMMMMMMSSk
+kkkkkkkkkkkkk
+"""
+CIVIS = """
+...kkkkkk
+..kBBBBBBk
+..kBhhhhBk
+..khkhhkHk
+..khhhhhHk
+...khhhHk
+.kkkkHHkkkk
+.kwwwpwwcpk
+.kwwpwwccpk
+.kwpwhhcppk
+.kpwwwccppk
+.kwwwpwccpk
+.kwwpwwcppk
+.kwpwwcccpk
+.kwwwpwccpk
+.kwwpwwcppk
+.kwpwwcccpk
+..kwwpwcpk
+..kwpwccpk
+..kkhkkHkk
+..kbbkkbBk
+..kkkkkkkk
+"""
+MATRONA = """
+...kkkkkk
+..kWWWWWWk
+.kWWBBBBWWk
+.kWBhhhhBWk
+.kWhkhhkhWk
+.kWhhhhhHPk
+.kWWhhhHWPk
+.kWWWHHWWPk
+.kWWAAAAWPk
+.kWAAYAAAPk
+.kWhAYAAaPk
+.kWWAYAAaPk
+..kWAAYAaPk
+..kWAAYAak
+..kAAAYAak
+..kAAYAAak
+..kAAYAAak
+..kAAYAaak
+..kAAAYaak
+..kAAAAaak
+..khhkkhHk
+..kkkkkkkk
+"""
+MERCATOR = """
+..kkkkkkkk
+.kynyynyylk
+.kltlttltlk
+..kkkkkkkk
+..kBhhhhBk
+..khkhhkHk
+..khhhhhHk
+...khhhHk
+.kkkkHHkkkk
+.kttttttllk
+.khtttttlHk
+.khtttttlHk
+.khBBBBBBHk
+.khtttttlHk
+.kkttttllkk
+..kttttllk
+..kkkkkkkk
+..kHHkkHHk
+..khhkkhHk
+..khhkkhHk
+..kbbkkbBk
+..kkkkkkkk
+"""
+PLAUSTRUM = """
+............kok.kok.kok
+...........korkkorkkork
+...........krRkkrRkkrRk
+.....kkkkkkkrRkkrRkkrRkkk
+.....klllllllllllllllllltk
+.....kbbbbbbbbbbbbbbbbbbBk
+....kkkkkkkkkkkkkkkkkkkkkk
+...kbk.....kkkkkk
+..kbk....kkblllbkk
+.kbk....kblbbBbblBk
+kbk.....klbBkkBblBk
+kk......klbBkkBblBk
+........kblbbBbbBBk
+.........kkbBBBkk
+...........kkkk
+"""
+
+CITY = [
+    ('prop_insula', insula, 'apartment block (insula): shops at street level, a timber balcony and three floors of small windows'),
+    ('prop_insula_b', insula_b, 'smaller apartment block in bare brick with travertine string courses and an arched shop'),
+    ('prop_domus', domus, 'town house (domus): blind street wall, tall doorway, the atrium roof with its open compluvium behind'),
+    ('prop_thermae', thermae, 'public baths (thermae): vaulted hall with a lunette window, a domed hot room and a smoking furnace flue'),
+    ('prop_basilica', basilica, 'basilica: two storeys of marble arcades under a long tiled roof'),
+    ('prop_pistrinum', pistrinum, 'bakery (pistrinum): brick oven with a fire, loaves on shelves, two lava millstones and a grain sack'),
+    ('prop_tholos', tholos, 'round temple (tholos, like the Temple of Vesta) with a conical roof'),
+    ('prop_portico', portico, 'a stretch of colonnade (porticus) under a tiled roof'),
+    ('prop_aqueduct', aqueduct, 'three arches of an aqueduct carrying its water channel; the arches are transparent'),
+    ('prop_theatre', theatre, 'theatre: the curved outer wall of the seating, two tiers of arcades below an attic'),
+    ('prop_obelisk', obelisk, 'red granite obelisk with a gilded tip, as on the spina of the Circus'),
+    ('prop_columna', columna, 'honorary column with a spiral of reliefs and a gilded statue on top'),
+    ('prop_rostra', rostra, "the Rostra: speakers' platform hung with the bronze rams of captured ships"),
+    ('prop_altar', ALTAR, 'marble altar with a garland and a burning offering'),
+    ('prop_civis', CIVIS, 'citizen in a toga, standing (static, facing the viewer)'),
+    ('prop_matrona', MATRONA, 'woman in a stola with her palla drawn over her head (static)'),
+    ('prop_mercator', MERCATOR, 'street seller in a tunic carrying a tray of loaves on his head (static)'),
+    ('prop_plaustrum', PLAUSTRUM, 'two-wheeled cart (plaustrum) loaded with amphorae'),
+]
+def build_city():
+    for aid, src, desc in CITY:
+        im = src() if callable(src) else GP(src, aid)
+        asset(aid, im, file=f'props/{aid}.png', w=im.size[0], h=im.size[1], frames=1, desc=desc + '. Anchor at bottom centre.')
+BUILDERS.append(build_city)
+
 # ================================================================== LANDMARKS
-# The milestone's inscription field (rows 4-12, columns 1-15) is flat marble, the same
-# colour as the backing of font_roman, so the week numeral reads as carved into the stone.
+# The milestone's inscription field (`face` in assets.json: 17 columns by 17 rows) is flat
+# marble. The app carves the week numeral into it with font_roman, on two lines when it is long.
 MILESTONE = """
-.....kkkkkkk.....
-...kkwmmmmmMkk...
-..kwmmmmmmmmmMk..
-.kwmmmmmmmmmmmmk.
-kmmmmmmmmmmmmmmmk
-kmmmmmmmmmmmmmmmk
-kmmmmmmmmmmmmmmmk
-kmmmmmmmmmmmmmmmk
-kmmmmmmmmmmmmmmmk
-kmmmmmmmmmmmmmmmk
-kmmmmmmmmmmmmmmmk
-kmmmmmmmmmmmmmmmk
-kSSSSSSSSSSSSSSSk
-kmmmmmmmmmmmmmmmk
-kwMMMMMMMMMMMMMSk
-kwmmmmmmmmmmMMSSk
-kwmmmmmmmmmmMMSSk
-kwmmmmmmmmmMMMSSk
-kwmmmmmmmmmMMMSSk
-kkkkkkkkkkkkkkkkk
-kSSmmmmmmmmMMMSsk
-kSSSSSSSSSSSSSssk
-kkkkkkkkkkkkkkkkk
+.......kkkkkkk.......
+.....kkwmmmmmMkk.....
+...kkwmmmmmmmmmMkk...
+..kwmmmmmmmmmmmmmMk..
+.kwmmmmmmmmmmmmmmmMk.
+kwmmmmmmmmmmmmmmmmmMk
+kwmmmmmmmmmmmmmmmmmMk
+kwmmmmmmmmmmmmmmmmmMk
+kwmmmmmmmmmmmmmmmmmMk
+kwmmmmmmmmmmmmmmmmmMk
+kwmmmmmmmmmmmmmmmmmMk
+kwmmmmmmmmmmmmmmmmmMk
+kwmmmmmmmmmmmmmmmmmMk
+kwmmmmmmmmmmmmmmmmmMk
+kwmmmmmmmmmmmmmmmmmMk
+kwmmmmmmmmmmmmmmmmmMk
+kwmmmmmmmmmmmmmmmmmMk
+kwmmmmmmmmmmmmmmmmmMk
+kwmmmmmmmmmmmmmmmmmMk
+kwmmmmmmmmmmmmmmmmmMk
+kwmmmmmmmmmmmmmmmmmMk
+kwmmmmmmmmmmmmmmmmmMk
+kwmmmmmmmmmmmmmmmmmMk
+kSSSSSSSSSSSSSSSSSSSk
+kkkkkkkkkkkkkkkkkkkkk
+kwmmmmmmmmmmmmmMMMSSk
+kSSSSSSSSSSSSSSSSSssk
+kkkkkkkkkkkkkkkkkkkkk
 """
 FOUNTAIN = """
 ..........kkkkkkkkkk
@@ -1701,6 +2155,9 @@ def build_landmarks():
         im = GP(text, aid); asset(aid, im, w=im.size[0], h=im.size[1], frames=1)
     for aid, fn in [('landmark_arch', arch), ('landmark_capitolium', capitolium)]:
         im = fn(); asset(aid, im, w=im.size[0], h=im.size[1], frames=1)
+    # where the app carves the numeral: [x, y, w, h] inside the sprite
+    META['landmark_milestone'].update(face=[2, 6, 17, 17], desc='Roman milestone (miliarium). `face` is its flat marble inscription field; the week number is carved there with font_roman, on two lines (tens above units) when it is too long for one. Anchor at bottom centre.')
+    META['landmark_arch'].update(face=[10, 4, 36, 7], desc='triumphal arch spanning the road where the chapter changes; `face` is the marble panel in the gold frame on the attic, which takes the chapter numeral. Anchor at bottom centre.')
 BUILDERS.append(build_landmarks)
 
 # ================================================================== UI
@@ -1723,21 +2180,23 @@ def waypoint(tones, emblem=None, at=(4, 4)):
     if emblem: put(im, G(emblem, 'wp'), *at)
     return im
 
-# Roman numerals: 3x7 strokes in a 5x9 cell on a marble backing (see MILESTONE).
+# Roman numerals: ink strokes 7 high on a transparent ground, carved by the app into the
+# marble of milestones and arches. `widths` in assets.json lets glyphs differ in width;
+# at present all seven are three wide.
 GLYPHS = {
     'I': "###\n.#.\n.#.\n.#.\n.#.\n.#.\n###", 'V': "#.#\n#.#\n#.#\n#.#\n#.#\n#.#\n.#.",
     'X': "#.#\n#.#\n#.#\n.#.\n#.#\n#.#\n#.#", 'L': "#..\n#..\n#..\n#..\n#..\n#..\n###",
     'C': ".##\n#..\n#..\n#..\n#..\n#..\n.##", 'D': "##.\n#.#\n#.#\n#.#\n#.#\n#.#\n##.",
     'M': "#.#\n###\n###\n#.#\n#.#\n#.#\n#.#",
 }
+FONT_ORDER = 'IVXLCDM'
+FONT_CELL = 4                                              # glyphs sit left-aligned in cells this far apart
 def font_roman():
-    order = 'IVXLCDM'
-    im = new(5 * len(order), 9, rgb('marble')); px = im.load()
-    for i, ch in enumerate(order):
+    im = new(FONT_CELL * len(FONT_ORDER), 7); px = im.load()
+    for i, ch in enumerate(FONT_ORDER):
         for y, row in enumerate(GLYPHS[ch].split('\n')):
             for x, c in enumerate(row):
-                if c == '#': px[i * 5 + 1 + x, 1 + y] = rgb('ink')
-    for x in range(im.size[0]): px[x, 8] = rgb('stone_lt')    # lower edge, matched on the milestone and the arch
+                if c == '#': px[i * FONT_CELL + x, y] = rgb('ink')
     return im
 
 def ui_frame():
@@ -2062,7 +2521,9 @@ def build_ui():
         asset('icon_' + iid, G(text, 'icon_' + iid), w=20, h=20, frames=1)
     asset('ui_frame', ui_frame(), w=24, h=24, frames=1, slice=8)
     asset('ui_tablet', ui_tablet(), w=48, h=24, frames=1)
-    asset('font_roman', font_roman(), w=5, h=9, frames=7, glyphs='IVXLCDM', advance=5)
+    asset('font_roman', font_roman(), w=3, h=7, frames=7, glyphs=FONT_ORDER, advance=FONT_CELL,
+          widths=[len(GLYPHS[c].split('\n')[0]) for c in FONT_ORDER], gap=1,
+          desc='Bitmap font sheet: glyphs I V X L C D M in that order, ink on transparent, 7 high. Each glyph sits left-aligned in a cell; cells are `advance` (4) apart, so the sheet is 28x7. `widths` is each glyph\'s width and `gap` the space the app leaves between glyphs.')
     small, big = app_icon_art(24), app_icon_art(32)
     asset('app_icon_192', small.resize((192, 192), Image.NEAREST), w=192, h=192, frames=1)          # 24px art x8
     asset('app_icon_512', big.resize((512, 512), Image.NEAREST), w=512, h=512, frames=1)            # 32px art x16 (maskable)
@@ -2104,8 +2565,17 @@ def write_all():
     M = json.load(open(mpath, encoding='utf-8'))
     for aid, im in OUT.items():
         a = M['assets'].get(aid)
-        if a is None: raise SystemExit(f'{aid} is not in assets.json')
+        if a is None:
+            if 'file' not in META[aid]: raise SystemExit(f'{aid} is not in assets.json')
+            a = M['assets'][aid] = {'id': aid}
         a.update(META[aid])
+        if aid.startswith('prop_'):                         # say where the map uses it
+            row = [k for k, d in M['districts'].items() if aid in d.get('buildings', [])]
+            loose = [k for k, d in M['districts'].items() if aid in d['props']]
+            a['use'] = '; '.join(t for t in (
+                'Map: built in rows in the city districts: ' + ', '.join(row) if row else '',
+                'Map decoration scattered beside the road in districts: ' + ', '.join(loose) if loose else '') if t) or 'Map decoration (not placed in any district yet)'
+            a['desc'] = a.pop('desc')                       # keep desc last
         path = os.path.normpath(os.path.join(ASSETS, a['file']))
         os.makedirs(os.path.dirname(path), exist_ok=True)
         im.save(path, optimize=True)

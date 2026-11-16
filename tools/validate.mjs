@@ -109,6 +109,7 @@ for (const [id, a] of Object.entries(M.assets)) {
 for (const [k, d] of Object.entries(M.districts)) {
   if (!M.assets[d.bg]) err(`district ${k}: background ${d.bg} not in assets`);
   for (const p of d.props) if (!M.assets[p]) err(`district ${k}: prop ${p} not in assets`);
+  for (const p of d.buildings || []) if (!M.assets[p]) err(`district ${k}: building ${p} not in assets`);
 }
 if (M.chapterDistricts.length !== 35) err('chapterDistricts must list 35 chapters');
 for (const req of ['hero_base', 'tile_via', 'landmark_milestone', 'landmark_arch', 'landmark_capitolium', 'landmark_fountain', 'landmark_shrine', 'wp_done', 'wp_current', 'wp_locked', 'wp_rest', 'ui_frame', 'font_roman'])
