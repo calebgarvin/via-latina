@@ -541,7 +541,8 @@ def write_guide(m, total):
              'A `landmark_arch` stands at the end of every chapter; the chapter title card (HTML, framed by `ui_frame`) appears when entering a new district.\n'
              '- `landmark_capitolium` crowns the very top (end of chapter XXXV).\n'
              '- Waypoints: `wp_done`, `wp_current`, `wp_locked`, `wp_rest`.\n'
-             '- The player is `hero_base` with optional overlay layers (`hero_toga`, `hero_cloak`, `hero_satchel`, `hero_laurel`) drawn in that order.\n')
+             '- The player is `hero_base` (always worn: tunic, belt, sandals) with optional overlay layers drawn on top in this fixed order: `hero_cloak`, `hero_toga`, `hero_satchel`, `hero_laurel`. '
+             'Any combination can be worn at once (all four by the end), so every layer must look right over the base alone and stacked with the others.\n')
     L.append('### Chapter → district\n')
     L.append('| chapter | district |\n|---|---|')
     for i, dname in enumerate(m['chapterDistricts']):

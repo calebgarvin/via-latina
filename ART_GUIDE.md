@@ -41,7 +41,7 @@ Placeholders use only these colours; the final art may extend the palette but sh
 - Each chapter is a district: its ground is the district tile (`bg_*`), decorated with that district's props scattered beside the road. A `landmark_arch` stands at the end of every chapter; the chapter title card (HTML, framed by `ui_frame`) appears when entering a new district.
 - `landmark_capitolium` crowns the very top (end of chapter XXXV).
 - Waypoints: `wp_done`, `wp_current`, `wp_locked`, `wp_rest`.
-- The player is `hero_base` with optional overlay layers (`hero_toga`, `hero_cloak`, `hero_satchel`, `hero_laurel`) drawn in that order.
+- The player is `hero_base` (always worn: tunic, belt, sandals) with optional overlay layers drawn on top in this fixed order: `hero_cloak`, `hero_toga`, `hero_satchel`, `hero_laurel`. Any combination can be worn at once (all four by the end), so every layer must look right over the base alone and stacked with the others.
 
 ### Chapter → district
 
