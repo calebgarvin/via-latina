@@ -11,7 +11,7 @@ To change a sprite, edit its grid and run `python3 tools/make_final_art.py` (nee
 - Sprites use a 1px dark outline (`ink` #2b1d16) or selective outlining.
 - Light comes from the upper left.
 - The map is drawn at an integer scale (×2 on iPhones, ×3 on larger screens) with nearest-neighbour scaling.
-- Total asset budget: keep everything under 5 MB (currently about 40 KB).
+- Total asset budget: keep everything under 5 MB (currently about 50 KB).
 
 ## Palette (32 colours)
 
@@ -42,11 +42,13 @@ Extras: gold_lt `#f3dc8c` (glint on gold), forest `#2b3620` (deep foliage shadow
 
 - The map is a tall vertical scroll. The road (`tile_via`) winds upward from chapter I at the bottom to the Capitol at the top.
 - 364 stops: 312 reading days + 52 rest stops (one after every 6 reading days). Each rest stop shows `landmark_fountain` or `landmark_shrine` (alternating) plus a `landmark_milestone` with the week number in Roman numerals (`font_roman`).
-- Each chapter is a district: its ground is the district tile (`bg_*`), decorated with that district's props scattered beside the road. A `landmark_arch` stands at the end of every chapter; the chapter title card (HTML, framed by `ui_frame`) appears when entering a new district.
+- Each chapter is a district: its ground is the district tile (`bg_*`), decorated with that district's `props` scattered beside the road. A `landmark_arch` stands on the boundary wherever the chapter changes (not after the last chapter, where the Capitol stands); the chapter title card (HTML, framed by `ui_frame`) appears when entering a new district.
+- **City districts.** A district with a `buildings` list in `assets.json` (at present `taberna`, `urbs` and `forum`) is laid out as part of Rome: rows of those buildings stand shoulder to shoulder on both sides of the road, each row far enough behind the one in front that its upper floors show above the roofs, with a pavement beside the road, the odd alley and a small square now and then (`open` is the chance of a gap, 0 to 1). The district's `props` (people, carts, lamps, statues) then stand on the pavement and in the gaps. A name listed twice is picked twice as often. `density` (0 to 1) sets how many loose props any district gets. The other districts stay open country.
+- Nothing overlaps: props keep clear of the road for their whole height, of every landmark and of each other's ground, and small things are never hidden behind buildings. Rest-stop landmarks slide along the road when an arch or the Capitol is in the way.
 - `landmark_capitolium` crowns the very top (end of chapter XXXV).
-- Scale: one consistent scale, set by the 16×24 hero. A door is about his height, a house or shop is 44 px wide, the temple 48, the arch 56 and the Capitol 96.
+- Scale: one consistent scale, set by the 16×24 hero. A door is about his height, a house or shop is 44 px wide, the temple 48, the arch 56 and the Capitol 96. An apartment block (insula) is 42×60, the baths 60×46, the basilica 68×46; townspeople are 22 px tall.
 - Ground tiles are 64×64 and the road tile 32×32, so repeats are hard to spot on a phone (the visible map is about 190 art px wide).
-- Numerals: `font_roman` has a marble backing rather than a transparent one. On the milestone face and the arch panel the backing is invisible (same marble, same shadow line); a numeral too long for the milestone (four characters or more) is drawn by the app above the stone, where the backing turns it into a small inscribed slab that stays legible on dark ground such as sea or forest. If you repaint the milestone or the arch, keep those two fields flat `marble` with a `stone_lt` line along the bottom row.
+- Numerals: `font_roman` is ink on a transparent ground. The app carves each numeral into the `face` rectangle (`[x, y, w, h]` inside the sprite) given in `assets.json` for `landmark_milestone` and `landmark_arch`, centred; a week numeral too wide for the milestone goes on two lines, tens above units (XXX over VIII). If you repaint the milestone or the arch, keep the face flat `marble` and update `face` if it moves.
 - Waypoints: `wp_done`, `wp_current`, `wp_locked`, `wp_rest`.
 - The player is `hero_base` (always worn: tunic, belt, sandals) with optional overlay layers drawn on top in this fixed order: `hero_cloak`, `hero_toga`, `hero_satchel`, `hero_laurel`. Any combination can be worn at once (all four by the end), so every layer must look right over the base alone and stacked with the others.
 
@@ -117,14 +119,14 @@ Extras: gold_lt `#f3dc8c` (glint on gold), forest `#2b3620` (deep foliage shadow
 | `bg_triclinium` | `tiles/bg_triclinium.png` | 64×64 | 1 | Map background, district: The dining room (banquet) | Seamless 64x64 ground tile: mosaic floor in deep reds. |
 | `bg_theatrum` | `tiles/bg_theatrum.png` | 64×64 | 1 | Map background, district: Theater and circus | Seamless 64x64 ground tile: sand of the arena. |
 | `bg_forum` | `tiles/bg_forum.png` | 64×64 | 1 | Map background, district: The Forum and the Capitol (finale) | Seamless 64x64 ground tile: gleaming marble and gold-flecked paving. |
-| `prop_cypress` | `props/prop_cypress.png` | 14×36 | 1 | Map decoration scattered beside the road in districts: provinciae, villa, via, silva, templa, forum | tall slender Italian cypress. Anchor at bottom centre. |
+| `prop_cypress` | `props/prop_cypress.png` | 14×36 | 1 | Map decoration scattered beside the road in districts: provinciae, villa, via, silva, templa | tall slender Italian cypress. Anchor at bottom centre. |
 | `prop_pine` | `props/prop_pine.png` | 30×31 | 1 | Map decoration scattered beside the road in districts: via, silva | Italian umbrella (stone) pine. Anchor at bottom centre. |
 | `prop_olive` | `props/prop_olive.png` | 24×23 | 1 | Map decoration scattered beside the road in districts: provinciae, hortus, rus, creta | olive tree, silvery leaves. Anchor at bottom centre. |
 | `prop_bush` | `props/prop_bush.png` | 14×10 | 1 | Map decoration scattered beside the road in districts: villa, hortus, silva | low shrub with a few rose blossoms. Anchor at bottom centre. |
 | `prop_column` | `props/prop_column.png` | 10×28 | 1 | Map decoration scattered beside the road in districts: villa, hortus, templa, ludus, urbs, creta, triclinium, theatrum, forum | single marble column. Anchor at bottom centre. |
-| `prop_statue` | `props/prop_statue.png` | 14×31 | 1 | Map decoration scattered beside the road in districts: hortus, templa, ludus, theatrum, forum | marble statue on a plinth. Anchor at bottom centre. |
-| `prop_house` | `props/prop_house.png` | 44×36 | 1 | Map decoration scattered beside the road in districts: villa, via, taberna, urbs | small Roman house with terracotta roof. Anchor at bottom centre. |
-| `prop_shop` | `props/prop_shop.png` | 44×34 | 1 | Map decoration scattered beside the road in districts: taberna, urbs | taberna (shop front) with striped awning and goods. Anchor at bottom centre. |
+| `prop_statue` | `props/prop_statue.png` | 14×31 | 1 | Map decoration scattered beside the road in districts: hortus, templa, ludus, urbs, theatrum, forum | marble statue on a plinth. Anchor at bottom centre. |
+| `prop_house` | `props/prop_house.png` | 44×36 | 1 | Map: built in rows in the city districts: taberna; Map decoration scattered beside the road in districts: villa, via | small Roman house with terracotta roof. Anchor at bottom centre. |
+| `prop_shop` | `props/prop_shop.png` | 44×34 | 1 | Map: built in rows in the city districts: taberna | taberna (shop front) with striped awning and goods. Anchor at bottom centre. |
 | `prop_sheep` | `props/prop_sheep.png` | 14×11 | 1 | Map decoration scattered beside the road in districts: rus | white sheep (pastor et ovēs). Anchor at bottom centre. |
 | `prop_rock` | `props/prop_rock.png` | 13×9 | 1 | Map decoration scattered beside the road in districts: provinciae, via, rus, silva, castra, mare, creta, caelum | grey boulder. Anchor at bottom centre. |
 | `prop_vine` | `props/prop_vine.png` | 12×19 | 1 | Map decoration scattered beside the road in districts: rus | grapevine on a stake with purple grapes. Anchor at bottom centre. |
@@ -135,7 +137,7 @@ Extras: gold_lt `#f3dc8c` (glint on gold), forest `#2b3620` (deep foliage shadow
 | `prop_standard` | `props/prop_standard.png` | 10×30 | 1 | Map decoration scattered beside the road in districts: castra | legion standard (aquila) with red banner. Anchor at bottom centre. |
 | `prop_amphora` | `props/prop_amphora.png` | 10×16 | 1 | Map decoration scattered beside the road in districts: villa, taberna, triclinium | clay amphora. Anchor at bottom centre. |
 | `prop_bench` | `props/prop_bench.png` | 20×12 | 1 | Map decoration scattered beside the road in districts: ludus | school bench with a wax tablet. Anchor at bottom centre. |
-| `prop_templum` | `props/prop_templum.png` | 48×46 | 1 | Map decoration scattered beside the road in districts: provinciae, templa, forum | small temple facade. Anchor at bottom centre. |
+| `prop_templum` | `props/prop_templum.png` | 48×46 | 1 | Map: built in rows in the city districts: forum; Map decoration scattered beside the road in districts: provinciae, templa | small temple facade. Anchor at bottom centre. |
 | `prop_wall` | `props/prop_wall.png` | 32×18 | 1 | Map decoration scattered beside the road in districts: castra | crenellated stone wall segment. Anchor at bottom centre. |
 | `prop_labyrinth` | `props/prop_labyrinth.png` | 24×23 | 1 | Map decoration scattered beside the road in districts: creta | stone slab carved with a labyrinth (Crete). Anchor at bottom centre. |
 | `prop_cloud` | `props/prop_cloud.png` | 28×9 | 1 | Map decoration scattered beside the road in districts: caelum | small cloud. Anchor at bottom centre. |
@@ -144,10 +146,28 @@ Extras: gold_lt `#f3dc8c` (glint on gold), forest `#2b3620` (deep foliage shadow
 | `prop_lamp` | `props/prop_lamp.png` | 8×22 | 1 | Map decoration scattered beside the road in districts: taberna, ludus, urbs, triclinium | standing oil lamp. Anchor at bottom centre. |
 | `prop_mask` | `props/prop_mask.png` | 12×18 | 1 | Map decoration scattered beside the road in districts: theatrum | painted theatre mask on a short stone post. Anchor at bottom centre. |
 | `prop_arena` | `props/prop_arena.png` | 44×24 | 1 | Map decoration scattered beside the road in districts: theatrum | small circus/arena oval. Anchor at bottom centre. |
-| `landmark_milestone` | `landmarks/landmark_milestone.png` | 17×23 | 1 | Map: every rest stop (one per week) | Roman milestone (miliarium) with a flat marble inscription field (rows 4-12, columns 1-15); the week number is drawn on it with font_roman. Anchor at bottom centre. |
+| `prop_insula` | `props/prop_insula.png` | 42×60 | 1 | Map: built in rows in the city districts: taberna, urbs | apartment block (insula): shops at street level, a timber balcony and three floors of small windows. Anchor at bottom centre. |
+| `prop_insula_b` | `props/prop_insula_b.png` | 34×50 | 1 | Map: built in rows in the city districts: taberna, urbs | smaller apartment block in bare brick with travertine string courses and an arched shop. Anchor at bottom centre. |
+| `prop_domus` | `props/prop_domus.png` | 54×34 | 1 | Map: built in rows in the city districts: urbs | town house (domus): blind street wall, tall doorway, the atrium roof with its open compluvium behind. Anchor at bottom centre. |
+| `prop_thermae` | `props/prop_thermae.png` | 60×46 | 1 | Map: built in rows in the city districts: urbs | public baths (thermae): vaulted hall with a lunette window, a domed hot room and a smoking furnace flue. Anchor at bottom centre. |
+| `prop_basilica` | `props/prop_basilica.png` | 68×46 | 1 | Map: built in rows in the city districts: forum | basilica: two storeys of marble arcades under a long tiled roof. Anchor at bottom centre. |
+| `prop_pistrinum` | `props/prop_pistrinum.png` | 42×37 | 1 | Map: built in rows in the city districts: taberna | bakery (pistrinum): brick oven with a fire, loaves on shelves, two lava millstones and a grain sack. Anchor at bottom centre. |
+| `prop_tholos` | `props/prop_tholos.png` | 36×42 | 1 | Map: built in rows in the city districts: forum; Map decoration scattered beside the road in districts: templa | round temple (tholos, like the Temple of Vesta) with a conical roof. Anchor at bottom centre. |
+| `prop_portico` | `props/prop_portico.png` | 46×30 | 1 | Map: built in rows in the city districts: urbs, forum | a stretch of colonnade (porticus) under a tiled roof. Anchor at bottom centre. |
+| `prop_aqueduct` | `props/prop_aqueduct.png` | 54×46 | 1 | Map: built in rows in the city districts: urbs | three arches of an aqueduct carrying its water channel; the arches are transparent. Anchor at bottom centre. |
+| `prop_theatre` | `props/prop_theatre.png` | 60×42 | 1 | Map decoration scattered beside the road in districts: theatrum | theatre: the curved outer wall of the seating, two tiers of arcades below an attic. Anchor at bottom centre. |
+| `prop_obelisk` | `props/prop_obelisk.png` | 12×46 | 1 | Map decoration scattered beside the road in districts: theatrum | red granite obelisk with a gilded tip, as on the spina of the Circus. Anchor at bottom centre. |
+| `prop_columna` | `props/prop_columna.png` | 16×56 | 1 | Map decoration scattered beside the road in districts: forum | honorary column with a spiral of reliefs and a gilded statue on top. Anchor at bottom centre. |
+| `prop_rostra` | `props/prop_rostra.png` | 46×22 | 1 | Map decoration scattered beside the road in districts: forum | the Rostra: speakers' platform hung with the bronze rams of captured ships. Anchor at bottom centre. |
+| `prop_altar` | `props/prop_altar.png` | 13×16 | 1 | Map decoration scattered beside the road in districts: templa, forum | marble altar with a garland and a burning offering. Anchor at bottom centre. |
+| `prop_civis` | `props/prop_civis.png` | 11×22 | 1 | Map decoration scattered beside the road in districts: taberna, urbs, theatrum, forum | citizen in a toga, standing (static, facing the viewer). Anchor at bottom centre. |
+| `prop_matrona` | `props/prop_matrona.png` | 11×22 | 1 | Map decoration scattered beside the road in districts: taberna, urbs, theatrum, forum | woman in a stola with her palla drawn over her head (static). Anchor at bottom centre. |
+| `prop_mercator` | `props/prop_mercator.png` | 11×22 | 1 | Map decoration scattered beside the road in districts: taberna, urbs | street seller in a tunic carrying a tray of loaves on his head (static). Anchor at bottom centre. |
+| `prop_plaustrum` | `props/prop_plaustrum.png` | 26×15 | 1 | Map decoration scattered beside the road in districts: taberna, urbs | two-wheeled cart (plaustrum) loaded with amphorae. Anchor at bottom centre. |
+| `landmark_milestone` | `landmarks/landmark_milestone.png` | 21×28 | 1 | Map: every rest stop (one per week) | Roman milestone (miliarium). `face` is its flat marble inscription field; the week number is carved there with font_roman, on two lines (tens above units) when it is too long for one. Anchor at bottom centre. |
 | `landmark_fountain` | `landmarks/landmark_fountain.png` | 30×25 | 1 | Map: rest stop (catch-up day), alternates with shrine | public fountain with a basin and a spout. Anchor at bottom centre. |
 | `landmark_shrine` | `landmarks/landmark_shrine.png` | 22×31 | 1 | Map: rest stop (catch-up day), alternates with fountain | small roadside shrine (lararium/aedicula) with a gilded image. Anchor at bottom centre. |
-| `landmark_arch` | `landmarks/landmark_arch.png` | 56×44 | 1 | Map: end of every chapter | triumphal arch spanning the road; the marble panel in the gold frame on the attic (rows 3-11, columns 10-45) takes the chapter numeral. Anchor at bottom centre. |
+| `landmark_arch` | `landmarks/landmark_arch.png` | 56×44 | 1 | Map: end of every chapter | triumphal arch spanning the road where the chapter changes; `face` is the marble panel in the gold frame on the attic, which takes the chapter numeral. Anchor at bottom centre. |
 | `landmark_capitolium` | `landmarks/landmark_capitolium.png` | 96×72 | 1 | Map: final destination (end of chapter XXXV) | Temple of Jupiter on the Capitoline: wide steps, columns, gilded pediment. Anchor at bottom centre. |
 | `wp_locked` | `ui/wp_locked.png` | 12×12 | 1 | Map: waypoint marker on the road | dim grey stepping stone (future day, locked). |
 | `wp_current` | `ui/wp_current.png` | 12×12 | 1 | Map: waypoint marker on the road | glowing golden marker (today's unlocked stop). |
@@ -168,7 +188,7 @@ Extras: gold_lt `#f3dc8c` (glint on gold), forest `#2b3620` (deep foliage shadow
 | `icon_scroll` | `ui/icon_scroll.png` | 20×20 | 1 | UI icon (wardrobe, stats) | Icon: scroll for "words learned". |
 | `ui_frame` | `ui/ui_frame.png` | 24×24 | 1 | UI: 9-slice frame for chapter title cards and panels (8px slices) | Parchment panel with a terracotta double border and gold corner studs. Must work as CSS border-image with 8px slices. |
 | `ui_tablet` | `ui/ui_tablet.png` | 48×24 | 1 | Rewards screen: background of each collected chapter inscription | Marble inscription tablet (tabula ansata) with a carved inner border; text is overlaid by the app. |
-| `font_roman` | `ui/font_roman.png` | 5×9 per glyph (sheet 35×9) | 7 | Map: Roman numerals on milestones and arches | Bitmap font sheet: glyphs I V X L C D M in that order. Each cell is 5x9 with no gap (sheet 35x9): ink strokes 3x7 on a marble backing with a shadow line along the bottom, matching the milestone face and the arch panel. |
+| `font_roman` | `ui/font_roman.png` | 3×7 per glyph (sheet 28×7) | 7 | Map: Roman numerals on milestones and arches | Bitmap font sheet: glyphs I V X L C D M in that order, ink on transparent, 7 high. Each glyph sits left-aligned in a cell; cells are `advance` (4) apart, so the sheet is 28x7. `widths` is each glyph's width and `gap` the space the app leaves between glyphs. |
 | `app_icon_180` | `../icons/icon-180.png` | 180×180 | 1 | Home-screen / PWA icon | App icon: a laurel wreath around a cream letter L on a terracotta field, pixel-art style (24x24 art upscaled ×7 on a 180px field). |
 | `app_icon_192` | `../icons/icon-192.png` | 192×192 | 1 | Home-screen / PWA icon | App icon: a laurel wreath around a cream letter L on a terracotta field, pixel-art style (24x24 art upscaled ×8). |
 | `app_icon_512` | `../icons/icon-512.png` | 512×512 | 1 | Home-screen / PWA icon | App icon: a laurel wreath around a cream letter L on a terracotta field, pixel-art style (32x32 art upscaled ×16; the wreath stays inside the maskable safe zone). |

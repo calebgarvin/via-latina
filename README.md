@@ -109,13 +109,16 @@ content.enc                               encrypted course content (the only boo
 assets/assets.json + PNGs                 all art; the app reads nothing else (see ART_GUIDE.md)
 icons/                                    home-screen icons (also listed in assets.json)
 tools/validate.mjs                        validation script
-tools/make_placeholder_art.py             regenerates placeholder art, assets.json and ART_GUIDE.md
+tools/make_final_art.py                   draws every PNG and keeps the sizes in assets.json in step (needs Pillow)
+tools/make_placeholder_art.py             the old placeholder generator; do not run it, it overwrites the final art
 tools/serve.mjs                           local test server: node tools/serve.mjs  → http://127.0.0.1:8765
 content-src/  (git-ignored)               OCR pipeline, vocabulary, schedule builder, encryption script, OCR report
 ```
 
-## Swapping in the final art
+## Changing the art
 
-See [ART_GUIDE.md](ART_GUIDE.md). To swap art, replace the PNGs at the same size, or edit `assets/assets.json`
-(frame counts, fps and anchors are read from there). No code changes are needed.
-If you re-run `make_placeholder_art.py` after adding real art, pass `--keep` so existing PNGs aren't overwritten.
+See [ART_GUIDE.md](ART_GUIDE.md). Every PNG is drawn by `tools/make_final_art.py`: edit a sprite's grid there and run
+`python3 tools/make_final_art.py`, then `node tools/validate.mjs`. You can also replace a PNG at the same size, or edit
+its entry in `assets/assets.json` (frame counts, fps and anchors are read from there). Which props and buildings each
+district gets, and which districts are built up as city streets, is set in the `districts` table of `assets.json`.
+Do not run `make_placeholder_art.py`: it overwrites the final PNGs and resets the sizes in `assets.json`.

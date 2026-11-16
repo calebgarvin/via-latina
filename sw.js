@@ -1,6 +1,6 @@
 // Offline support: precache the app, then serve from cache and refresh in the background
 // (stale-while-revalidate), so updates pushed to GitHub Pages arrive on the next launch.
-const CACHE = 'via-latina-v1';
+const CACHE = 'via-latina-v2';
 const SHELL = [
   './', 'index.html', 'manifest.webmanifest', 'css/app.css',
   'js/app.js', 'js/art.js', 'js/content.js', 'js/crypto.js', 'js/map.js', 'js/review.js', 'js/state.js', 'js/store.js', 'js/util.js',
